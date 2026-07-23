@@ -1514,49 +1514,6 @@ class PB_Hud_ZS : BaseStatusBar
 		PBHud_DrawString(mBoldFont, Formatnumber(GetAmount(eqAmmo)), (-47, -33), DI_TEXT_ALIGN_CENTER, eqFont, scale: (0.8, 0.8));
 	}
 
-	void PBHud_DrawEquipments()
-	{
-		PBHud_DrawImage("EQUPBO", (-15, -17), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_RIGHT_BOTTOM, playerBoxAlpha);
-				
-		name eqImage;
-		name eqAmmo;
-		int eqFont;
-		switch(pbWeap.selectedEquipment)
-		{
-			case PB_WeaponBase.FRAG_GRENADE: 
-				eqImage = "ALISTGRN";
-				eqAmmo = "PB_GrenadeAmmo"; 
-				eqFont = Font.CR_GREEN;
-				break;
-
-			case PB_WeaponBase.PROX_MINE: 
-				eqImage = "ALISTMIN"; 
-				eqAmmo = "PB_ProxMineAmmo"; 
-				eqFont = Font.CR_PURPLE;
-				break;
-
-			case PB_WeaponBase.STUN_GRENADE: 
-				eqImage = "ALISTSTN"; 
-				eqAmmo = "PB_StunGrenadeAmmo"; 
-				eqFont = Font.CR_CYAN;
-				break;
-
-			case PB_WeaponBase.LEECH: 
-				eqImage = "ALISTLCH"; 
-				eqAmmo = "PB_DTech"; 
-				eqFont = cachedFontColors[DTECHAMMO];
-				break;
-
-			case PB_WeaponBase.REV_GUN: 
-				eqImage = "ALISTREV"; 
-				eqAmmo = "PB_QuickLauncherAmmo"; 
-				eqFont = Font.CR_LIGHTBLUE;
-				break;
-		}
-		PBHud_DrawImage(eqImage, (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-		PBHud_DrawString(mBoldFont, Formatnumber(GetAmount(eqAmmo)), (-47, -33), DI_TEXT_ALIGN_CENTER, eqFont, scale: (0.8, 0.8));
-	}
-
 	bool PB_WeaponUsesPBAmmoType()
     {
         return PB_WeaponUsesPBAmmoType1() || PB_WeaponUsesPBAmmoType2();
