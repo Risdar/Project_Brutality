@@ -1104,6 +1104,7 @@ extend class PB_WeaponBase
 	// 	return false;
 	// }
 
+<<<<<<< HEAD
 <<<<<<< HEAD:zscript/Weapons/BaseWeapon_Functions.zsc
 		if(mg42 && mg42 is "PB_MG42" && mg42.barrelOverheating || mg42.hasOverheated && !IsHoldingBarrel())
 			return true;
@@ -1239,6 +1240,9 @@ extend class PB_WeaponBase
 =======
 //////////////////////////// DUAL WIELD FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
 >>>>>>> e97562639 (1. Reorganized BaseWeapon):zscript/Weapons/BaseWeapon/BaseWeapon_Functions.zsc
+=======
+//////////////////////////// DUAL WIELD FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+>>>>>>> e97562639c7003568b5c426b964a51ca9b7923d3
 	// Yes I am that lazy
 	action void PB_ClearDualWield()
 	{
