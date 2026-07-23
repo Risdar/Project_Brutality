@@ -677,7 +677,7 @@ class PB_SMG : PB_WeaponBase
         ReadyToFire2:
             A1F3 F 1 {
                 if(getSilencer()) PB_CoolDownBarrel(0, 0, 4.3);
-                return PB_ReadyFire(ads:true);
+                return PB_ReadyFire();
             }
             Loop;
 

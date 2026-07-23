@@ -74,7 +74,6 @@ class PB_PlayerPrawn : PlayerPawnBase
 		Player.StartItem "CarbineFullAuto";
 		Player.StartItem "HasNotPickedUpSSG",1;
 		Player.StartItem "IsPlayer",1;
-		Player.StartItem "FragGrenadeSelected",1;
 		
 		Player.StartItem "PB_HighCalMag", 90;
 		Player.StartItem "PB_LowCalMag", 60;

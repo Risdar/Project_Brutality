@@ -600,7 +600,7 @@ class PB_Pistol : PB_WeaponBase
             TNT1 A 0 PB_SelectIfUpgrade("PB_SMG");
             D7GG F 1 {
                 PB_CoolDownBarrel(0, 0, 6);
-                return PB_ReadyFire(ads:true);
+                return PB_ReadyFire();
             }
             Loop;
 

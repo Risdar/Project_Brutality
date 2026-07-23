@@ -852,9 +852,9 @@ class PB_Hud_ZS : BaseStatusBar
 		"AMMOIC6S, PB_Fuel, PB_Fuel, Ammo",
 		"AMMOIC7S, PB_DTech, PB_DTech, Ammo",
 		"ALISTGRN, PB_GrenadeAmmo, Green, Equipment",
-		"ALISTREV, PB_QuickLauncherAmmo, LightBlue, Equipment",
 		"ALISTMIN, PB_ProxMineAmmo, Purple, Equipment",
-		"ALISTSTN, PB_StunGrenadeAmmo, Cyan, Equipment"
+		"ALISTSTN, PB_StunGrenadeAmmo, Cyan, Equipment",
+		"ALISTREV, PB_QuickLauncherAmmo, LightBlue, Equipment"
 	};
 	
 	void PB_AmmoListDrawer(vector2 initialpos, int step = 12) 
@@ -1434,28 +1434,8 @@ class PB_Hud_ZS : BaseStatusBar
 				PBHud_DrawString(mDefaultFont, weap.GetTag(), (-110, -24), DI_SCREEN_RIGHT_BOTTOM | DI_TEXT_ALIGN_RIGHT, weaponBarAccent, scale: (0.5, 0.5));
 				
 				//Equipment
-				PBHud_DrawImage("EQUPBO", (-15, -17), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_RIGHT_BOTTOM, playerBoxAlpha);
-				
-				if(CheckInventory("FragGrenadeSelected")) {
-					PBHud_DrawImage("ALISTGRN", (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-					PBHud_DrawString(mBoldFont, Formatnumber(GetAmount("PB_GrenadeAmmo")), (-47, -33), DI_TEXT_ALIGN_CENTER, Font.CR_GREEN, scale: (0.8, 0.8));
-				}
-				else if(CheckInventory("ProximityMineSelected")) {
-					PBHud_DrawImage("ALISTMIN", (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-					PBHud_DrawString(mBoldFont, Formatnumber(GetAmount("PB_ProxMineAmmo")), (-47, -33), DI_TEXT_ALIGN_CENTER, Font.CR_PURPLE, scale: (0.8, 0.8));
-				}
-				else if(CheckInventory("StunGrenadeSelected")) {
-					PBHud_DrawImage("ALISTSTN", (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-					PBHud_DrawString(mBoldFont, Formatnumber(GetAmount("PB_StunGrenadeAmmo")), (-47, -33), DI_TEXT_ALIGN_CENTER, Font.CR_CYAN, scale: (0.8, 0.8));
-				}
-				else if(CheckInventory("RevGunSelected")) {
-					PBHud_DrawImage("ALISTREV", (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-					PBHud_DrawString(mBoldFont, Formatnumber(GetAmount("PB_QuickLauncherAmmo")), (-47, -33), DI_TEXT_ALIGN_CENTER, Font.CR_LIGHTBLUE, scale: (0.8, 0.8));
-				}
-				else if(CheckInventory("LeechSelected")) {
-					PBHud_DrawImage("ALISTLCH", (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
-					PBHud_DrawString(mBoldFont, Formatnumber(GetAmount("PB_DTech")), (-47, -33), DI_TEXT_ALIGN_CENTER, cachedFontColors[DTECHAMMO], scale: (0.8, 0.8));
-				}
+				PBHud_DrawEquipments();
+
 			}
 
 			if (Health > 0 && isInventoryBarVisible()) //Placeholder for now, at least it works(?)
@@ -1489,6 +1469,49 @@ class PB_Hud_ZS : BaseStatusBar
 				PBHud_DrawString(mBoldFont, String.format("XY: %i Z: %i", plr.vel.xy.Length() * unitscale, abs(plr.vel.z) * unitscale), (0, 120), DI_TEXT_ALIGN_CENTER|DI_SCREEN_CENTER_TOP, Font.CR_WHITE);
 			}
 		}
+	}
+
+	void PBHud_DrawEquipments()
+	{
+		PBHud_DrawImage("EQUPBO", (-15, -17), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_RIGHT_BOTTOM, playerBoxAlpha);
+				
+		name eqImage;
+		name eqAmmo;
+		int eqFont;
+		switch(pbWeap.selectedEquipment)
+		{
+			case PB_WeaponBase.FRAG_GRENADE: 
+				eqImage = "ALISTGRN";
+				eqAmmo = "PB_GrenadeAmmo"; 
+				eqFont = Font.CR_GREEN;
+				break;
+
+			case PB_WeaponBase.PROX_MINE: 
+				eqImage = "ALISTMIN"; 
+				eqAmmo = "PB_ProxMineAmmo"; 
+				eqFont = Font.CR_PURPLE;
+				break;
+
+			case PB_WeaponBase.STUN_GRENADE: 
+				eqImage = "ALISTSTN"; 
+				eqAmmo = "PB_StunGrenadeAmmo"; 
+				eqFont = Font.CR_CYAN;
+				break;
+
+			case PB_WeaponBase.LEECH: 
+				eqImage = "ALISTLCH"; 
+				eqAmmo = "PB_DTech"; 
+				eqFont = cachedFontColors[DTECHAMMO];
+				break;
+
+			case PB_WeaponBase.REV_GUN: 
+				eqImage = "ALISTREV"; 
+				eqAmmo = "PB_QuickLauncherAmmo"; 
+				eqFont = Font.CR_LIGHTBLUE;
+				break;
+		}
+		PBHud_DrawImage(eqImage, (-46, -45), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_CENTER, scale: (0.8, 0.8));
+		PBHud_DrawString(mBoldFont, Formatnumber(GetAmount(eqAmmo)), (-47, -33), DI_TEXT_ALIGN_CENTER, eqFont, scale: (0.8, 0.8));
 	}
 
 	bool PB_WeaponUsesPBAmmoType()
