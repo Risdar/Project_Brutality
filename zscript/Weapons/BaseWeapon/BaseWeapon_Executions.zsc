@@ -1,5 +1,399 @@
 extend class PB_WeaponBase
 {
+//////////////////////////// EXECUTIONS FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+	action StateLabel PB_ExecuteGeneric() 
+	{
+		StateLabel result;
+		int selector = (random(1,4));
+		FLineTraceData RemoteRay;
+		bool wallcheck = LineTrace(
+			angle,
+			120,
+			pitch,
+			TRF_THRUACTORS,
+			offsetz: height-12,
+			data: RemoteRay
+		);
+		
+		result = "Execution_Generic";
+		return result;
+	}
+	
+	action StateLabel PB_ExecuteZombieMan() 
+	{
+		StateLabel result;
+		int selector = (random(1,4));
+		FLineTraceData RemoteRay;
+		bool wallcheck = LineTrace(
+			angle,
+			120,
+			pitch,
+			TRF_THRUACTORS,
+			offsetz: height-12,
+			data: RemoteRay
+		);
+		
+		// Drop Kick Fatality
+		if((Pos.Z-floorz) > 8) {
+			A_Warp(AAPTR_PLAYER_GETTARGET, 0, 0, 54, WARPF_USECALLERANGLE|WARPF_NOCHECKPOSITION);
+			result = "Execution_Zombieman4";
+			return result;
+		}
+		
+		// Wall Kick Fatality
+		if(wallcheck && RemoteRay.HitType == TRACE_HitWall) {
+			result = "Execution_Zombieman3";
+			return result;
+		}
+		
+		// Generic Fatalities
+		switch(selector){
+			case 1:
+				result = "Execution_Zombieman1";
+				break;
+			case 2:
+				result = "Execution_Zombieman2";
+				break;
+			case 3:
+				result = "Execution_Zombieman5";
+				break;
+			case 4:
+				result = "Execution_Zombieman6";
+				break;
+		}
+		return result;
+	}
+	
+	// Cacodemon
+	action StateLabel PB_ExecuteCacodemon() 
+	{
+		//A_GiveInventory("ExecutionToken", 1, AAPTR_PLAYER_GETTARGET); // Todo: Move this to a higher function once more fatalities are done
+		StateLabel result;
+		int selector = 1;//(random(1,2));
+		
+		// Generic Fatalities
+		switch(selector){
+			case 1:
+				result = "Execution_Cacodemon1";
+				break;
+// 			case 2:
+// 				result = "Execution_Imp2";
+// 				break;
+		}
+		return result;
+	}
+	
+	action StateLabel PB_ExecuteShotguny() 
+	{
+		//A_GiveInventory("ExecutionToken", 1, AAPTR_PLAYER_GETTARGET); // Todo: Move this to a higher function once more fatalities are done
+		StateLabel result;
+		int selector = (random(1,4));
+		FLineTraceData RemoteRay;
+		bool wallcheck = LineTrace(
+			angle,
+			120,
+			pitch,
+			TRF_THRUACTORS,
+			offsetz: height-12,
+			data: RemoteRay
+		);
+		
+		// Drop Kick Fatality
+		if((Pos.Z-floorz) > 8) {
+			A_Warp(AAPTR_PLAYER_GETTARGET, 0, 0, 54, WARPF_USECALLERANGLE|WARPF_NOCHECKPOSITION);
+			result = "Execution_ShotgunGuy4";
+			return result;
+		}
+		
+		// Wall Kick Fatality
+		if(wallcheck && RemoteRay.HitType == TRACE_HitWall) {
+			result = "Execution_ShotgunGuy3";
+			return result;
+		}
+		
+		// Generic Fatalities
+		switch(selector){
+			case 1:
+				result = "Execution_ShotgunGuy1";
+				break;
+			case 2:
+				result = "Execution_ShotgunGuy2";
+				break;
+			case 3:
+				result = "Execution_ShotgunGuy5";
+				break;
+			case 4:
+				result = "Execution_ShotgunGuy6";
+				break;
+		}
+		return result;
+	}
+	
+	
+	action StateLabel PB_ExecuteImp() 
+	{
+		//A_GiveInventory("ExecutionToken", 1, AAPTR_PLAYER_GETTARGET); // Todo: Move this to a higher function once more fatalities are done
+		StateLabel result;
+		int selector = (random(1,2));
+// 		int selector = 2;
+		FLineTraceData RemoteRay;
+		bool wallcheck = LineTrace(
+			angle,
+			120,
+			pitch,
+			TRF_THRUACTORS,
+			offsetz: height-12,
+			data: RemoteRay
+		);
+		
+		// Drop Kick Fatality
+		if((Pos.Z-floorz) > 8) {
+			A_Warp(AAPTR_PLAYER_GETTARGET, 0, 0, 54, WARPF_USECALLERANGLE|WARPF_NOCHECKPOSITION);
+			result = "Execution_Imp3";
+			return result;
+		}
+		
+		
+// 		// Wall Kick Fatality
+// 		if(wallcheck && RemoteRay.HitType == TRACE_HitWall) {
+// 			result = "Execution_Zombieman3";
+// 			return result;
+// 		}
+		
+		// Generic Fatalities
+		switch(selector)
+		{
+			case 1:
+				result = "Execution_Imp1";
+				break;
+			case 2:
+				result = "Execution_Imp2";
+				break;
+		}
+		return result;
+	}
+		
+	action StateLabel PB_ExecutionHandlerString(Actor monster) 
+	{
+	
+		name enemy = monster.getClassName();
+// 		A_print(enemy);
+		
+		switch(enemy){
+			// Zombieman
+			case 'PB_Zombieman':
+				return PB_ExecuteZombieMan();
+			case 'PB_PistolZombieman1':
+				return PB_ExecuteZombieMan();
+			case 'PB_HelmetZombieman':
+				return PB_ExecuteZombieMan();
+			case 'PB_PistolZombieman2':
+				return PB_ExecuteZombieMan();
+			
+			// Imp
+			case 'PB_Imp1':
+				return PB_ExecuteImp();
+				
+			//Shotgun Guy
+			case 'PB_ShotgunGuy':
+				return PB_ExecuteShotguny();
+				
+			//Cacodemon
+			case 'PB_Cacodemon':
+				return PB_ExecuteCacodemon();
+				
+			default:
+// 				A_Print("Execution Failed");
+				return PB_ExecuteGeneric();
+		}
+	}
+	
+	action void PB_SetPlayerExecutionProperties() 
+	{
+		A_GiveInventory("ExecutionToken", 1); // When dashing, make sure to STOP player momentum, or else it fucks with the execution. Using a token for now.
+		A_GiveInventory("PB_NoEffectInvul", 1); // So we don't break invulnerability
+		PB_ClearDualWield();
+		A_StopSound(CHAN_7);
+		A_StopSound(CHAN_WEAPON);
+		A_SetCrosshair(5);
+		A_Stop();
+		
+		PlayerInfo plr = PlayerPawn(self).player;
+// 		plr.mo.vel *= 0;
+		//plr.cheats |= CF_TOTALLYFROZEN|CF_NOTARGET|CF_GODMODE|CF_DOUBLEFIRINGSPEED|CF_INSTANTWEAPSWITCH|CF_FRIGHTENING  ;
+		plr.mo.bNODAMAGE = true;
+		plr.mo.bNOPAIN = true;
+//		SetPlayerProperty(0, 1, PROP_INVULNERABILITY); //This breaks the invulnerability power up. -JM
+// 		A_GiveInventory("PB_NoEffectInvul",1); //Use PB_NoEffectInvul so that it doesn't break the REAL invulnerability -JM
+// 		SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN );
+// 		SetPlayerProperty(0, 1, PROP_FLY);
+		PB_SetExecutingEnemy(true);
+	}
+	
+	
+	action void PB_UnsetPlayerExecutionProperties() 
+	{
+
+		PlayerInfo plr = PlayerPawn(self).player;
+		//plr.cheats &= ~(CF_TOTALLYFROZEN|CF_NOTARGET|CF_GODMODE|CF_INSTANTWEAPSWITCH|CF_DOUBLEFIRINGSPEED|CF_FRIGHTENING  );
+		plr.mo.bNODAMAGE = false;
+		plr.mo.bNOPAIN = false;
+		PB_SetExecutingEnemy(false);
+		PB_SetUsingMelee(false);
+		PB_SetExecutionBlueBlood(false);
+		PB_SetExecutionGreenBlood(false);
+		//A_ClearTarget();
+		A_TakeInventory("KnifeHasHit",1);
+		A_TakeInventory("PB_NoEffectInvul",1);
+		A_TakeInventory("HasCutingWeapon", 1);
+		A_TakeInventory("ExecutionToken", 1);
+		A_TakeInventory("PB_LockScreenTilt",1);
+		A_SetRoll(0, SPF_INTERPOLATE);
+		A_SetPitch(0, SPF_INTERPOLATE);
+		A_ZoomFactor(1.0);
+		A_OverlayFlags(-9,PSPF_PLAYERTRANSLATED, false);
+		A_OverlayFlags(PSP_WEAPON,PSPF_PLAYERTRANSLATED, false);
+		
+		
+		//Determine how much health is returned (risk vs. reward)
+		if (plr.health < 25) {
+			A_GiveInventory("HealthBonus",20);
+		}
+		else if (plr.health < 50 && plr.health >= 25) {
+			A_GiveInventory("HealthBonus",15);
+		}
+		else if (plr.health < 100 && plr.health >= 50) {
+			A_GiveInventory("HealthBonus",10);
+		}
+		else if (plr.health < 200 && plr.health >= 100) {
+			A_GiveInventory("HealthBonus",5);
+		}
+		else {
+			A_GiveInventory("HealthBonus",1);
+		}
+	}
+	
+	action void PB_Execute() 
+	{
+		if(CountInv("GrabbedBarrel") >= 1 || CountInv("GrabbedFlameBarrel") >= 1 || CountInv("GrabbedIceBarrel") >= 1) 
+			return;
+	
+//		 CVar experimental_settings = CVar.FindCVar('pb_experimental');
+		
+// 		if(experimental_settings.GetBool()){
+			//
+		if(GetPointer(AAPTR_PLAYER_GETTARGET) != NULL)
+		{
+			
+			if(GetPointer(AAPTR_PLAYER_GETTARGET).bCountKill)
+			{
+				LookExParams look;
+				look.FOV = 360;
+				
+				Actor monster = GetPointer(AAPTR_PLAYER_GETTARGET);
+
+				if (monster.IsVisible(self, true, look) && Distance3D(monster) < 200 ){
+					
+					int targetMaxHealth = monster.spawnHealth();
+					int targetCurrentHealth = monster.health;
+					
+					if (actorCanBeExecuted(monster)) {
+						
+						// Move Monster and Player toward each other
+						monster.A_Stop();
+						double spd = 27.;
+						vector3 delta = ( monster.pos.x - pos.x, monster.pos.y - pos.y, monster.pos.z - pos.z );
+						double angleToMonster = AngleTo(monster);
+						double pitchToMonster = VectorAngle( sqrt(delta.y * delta.y + delta.x * delta.x), delta.z );
+						monster.A_SetPitch(pitchToMonster, SPF_INTERPOLATE);
+						monster.A_SetAngle(angleToMonster+180,SPF_INTERPOLATE);
+						
+						vector3 neworigin = Vec3Offset(cos(angleToMonster) * spd,  sin(angleToMonster) * spd, sin(pitchToMonster) * spd);
+						monster.SetOrigin(neworigin,true);
+						
+						// Set Player View and Properties
+						int colorGreen = -16711936;
+						int colorBlue = -16776961;
+// 							A_LogInt(monster.BloodColor);
+						if(monster.BloodColor == colorGreen)
+						{
+							PB_SetExecutionGreenBlood(true);
+						}
+						
+						if(monster.BloodColor == colorBlue)
+						{
+							PB_SetExecutionBlueBlood(true);
+						}
+						
+						A_SetAngle(AngleTo(monster));
+						pitchToMonster = VectorAngle( sqrt(delta.y * delta.y + delta.x * delta.x), delta.z );
+						A_SetPitch(-pitchToMonster);
+						PB_SetPlayerExecutionProperties();
+						
+						StateLabel st = PB_ExecutionHandlerString(monster);
+						monster.A_Die("Execution");
+						A_Overlay(PSP_WEAPON,st);
+						A_OverlayOffset(PSP_WEAPON,0,32);
+						A_ClearOverlays(-998,-997);
+					}
+				}
+			}
+// 			}
+		}
+	}
+	
+	action bool actorCanBeExecuted(Actor monster) 
+	{	
+		int targetMaxHealth = monster.spawnHealth();
+		int targetCurrentHealth = monster.health;
+		
+		if(targetCurrentHealth < 1 || monster.bDORMANT)
+			return false;
+		 // In case the check desynced, found this during another gameplay
+		
+		if(CheckInventory("PB_PowerStrength",1) && (targetCurrentHealth <= targetMaxHealth*0.25 || targetCurrentHealth <= 150))
+			return true;
+	
+		
+		if(targetCurrentHealth < targetMaxHealth*0.20 || targetCurrentHealth <= 54)
+			return true;
+		
+		return false;
+		
+	}
+
+//////////////////////////// EXECUTIONS HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+	action bool PB_executingEnemy()
+	{
+		return invoker.executingEnemy;
+	}
+	
+	action void PB_SetExecutingEnemy(bool type)
+	{
+		invoker.executingEnemy = type;
+	}
+	
+	action bool PB_GetExecutionBlueBlood()
+	{
+		return invoker.executionBlueBlood;
+	}
+	
+	action void PB_SetExecutionBlueBlood(bool type)
+	{
+		invoker.executionBlueBlood = type;
+	}
+	
+	action bool PB_GetExecutionGreenBlood()
+	{
+		return invoker.executionGreenBlood;
+	}
+	
+	action void PB_SetExecutionGreenBlood(bool type)
+	{
+		invoker.executionGreenBlood = type;
+	}
+
+//////////////////////////// EXECUTION ANIMATIONS ////////////////////////////////////////////////////////////////////////////////////
 	States
     {
 	//Generic Execution (For placeholders)

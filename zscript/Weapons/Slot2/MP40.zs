@@ -294,7 +294,7 @@ class PB_MP40 : PB_WeaponBase
 				PB_CoolDownBarrel(-4.5, -2, -3, 0, frandom(0.5, 1.0), 0., 1, 0.5);
 				PB_CoolDownBarrel(-4.5, -3.5, -3, 0, frandom(0.5, 1.0), 0, 1, 0.5);
 				PB_CoolDownBarrel(-4.5, -5, -3, 0, frandom(0.5, 1.0), 0, 1, 0.5);
-				return PB_ReadyFire(ads:false);
+				return PB_ReadyFire();
 			}
 			Loop;
 
@@ -308,7 +308,7 @@ class PB_MP40 : PB_WeaponBase
 		ReadyToFire2:
 			MPZO E 1 {
 				PB_CoolDownBarrel(-1, 0, 0);
-				return PB_ReadyFire(ads:true);
+				return PB_ReadyFire();
 			}
 			Loop;
 
@@ -371,7 +371,7 @@ class PB_MP40 : PB_WeaponBase
 			MPZO G 1 MP40_Fire(2);
 			MPZO H 1 A_ZoomFactor(1.25);
 			MPZO G 1 Offset(0,31);
-			TNT1 A 0 Offset(0,32) PB_ReadyFire(ads:true);
+			TNT1 A 0 Offset(0,32) PB_ReadyFire();
 			Goto Ready2;
 
 //////////////////////////// ALTFIRE ////////////////////////////////////////////////////////////////////////////////////

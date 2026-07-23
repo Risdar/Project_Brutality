@@ -305,6 +305,13 @@ PB_WHEEL_SEMI = "Semi-Auto Mode";
 PB_WHEEL_BURST = "Burst Mode";
 PB_WHEEL_FULL = "Full-Auto Mode";
 
+// Equipments
+PB_SELECT_FRAG      = "Equipment Selected: \cdFrag Grenade";
+PB_SELECT_PROX      = "Equipment Selected: \ctProximity Mine";
+PB_SELECT_STUN      = "Equipment Selected: \cvStun Grenade";
+PB_SELECT_LEECH     = "Equipment Selected: \c[PB_DTech]Leech";
+PB_SELECT_REVGUN    = "Equipment Selected: \cnQuick Launcher";
+
 //Fists
 PB_FIST_NAME = "Fists";
 PB_FIST_TAG = "Bare Hands";
