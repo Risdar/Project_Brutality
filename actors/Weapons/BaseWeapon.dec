@@ -3,12 +3,6 @@
 Actor UseEquipment: Inventory {Inventory.maxamount 1}
 Actor ToggleEquipment: Inventory{Inventory.maxamount 1}
 
-Actor FragGrenadeSelected : Inventory {inventory.maxamount 1}
-Actor ProximityMineSelected : Inventory {inventory.maxamount 1}
-Actor StunGrenadeSelected : Inventory {inventory.maxamount 1}
-Actor LeechSelected : Inventory {inventory.maxamount 1}
-Actor RevGunSelected : Inventory {inventory.maxamount 1}
-
 Actor WW_FragGrenadeSelected : Inventory {inventory.maxamount 1}
 Actor WW_ProximityMineSelected : Inventory {inventory.maxamount 1}
 Actor WW_StunGrenadeSelected : Inventory {inventory.maxamount 1}

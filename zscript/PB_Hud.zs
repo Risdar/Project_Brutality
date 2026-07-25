@@ -1474,37 +1474,40 @@ class PB_Hud_ZS : BaseStatusBar
 	void PBHud_DrawEquipments()
 	{
 		PBHud_DrawImage("EQUPBO", (-15, -17), DI_SCREEN_RIGHT_BOTTOM | DI_ITEM_RIGHT_BOTTOM, playerBoxAlpha);
+
+		let pbplr = PB_PlayerPrawn(CPlayer.mo);
+		if(!pbplr) return;
 				
 		name eqImage;
 		name eqAmmo;
 		int eqFont;
-		switch(pbWeap.selectedEquipment)
+		switch(pbplr.selectedEquipment)
 		{
-			case PB_WeaponBase.FRAG_GRENADE: 
+			case FRAG_GRENADE: 
 				eqImage = "ALISTGRN";
 				eqAmmo = "PB_GrenadeAmmo"; 
 				eqFont = Font.CR_GREEN;
 				break;
 
-			case PB_WeaponBase.PROX_MINE: 
+			case PROX_MINE: 
 				eqImage = "ALISTMIN"; 
 				eqAmmo = "PB_ProxMineAmmo"; 
 				eqFont = Font.CR_PURPLE;
 				break;
 
-			case PB_WeaponBase.STUN_GRENADE: 
+			case STUN_GRENADE: 
 				eqImage = "ALISTSTN"; 
 				eqAmmo = "PB_StunGrenadeAmmo"; 
 				eqFont = Font.CR_CYAN;
 				break;
 
-			case PB_WeaponBase.LEECH: 
+			case LEECH: 
 				eqImage = "ALISTLCH"; 
 				eqAmmo = "PB_DTech"; 
 				eqFont = cachedFontColors[DTECHAMMO];
 				break;
 
-			case PB_WeaponBase.REV_GUN: 
+			case REV_GUN: 
 				eqImage = "ALISTREV"; 
 				eqAmmo = "PB_QuickLauncherAmmo"; 
 				eqFont = Font.CR_LIGHTBLUE;

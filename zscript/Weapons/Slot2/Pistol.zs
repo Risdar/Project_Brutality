@@ -316,7 +316,6 @@ class PB_Pistol : PB_WeaponBase
         A_SetInventory("GoWeaponSpecialAbility", 0);
         PB_SetZoom(false);
         PB_HandleCrosshair(43);
-        A_ZoomFactor(1.0);
         PB_ClearDualWield();
         A_PlaySoundEx("Ironsights", "Auto");
 
@@ -739,17 +738,13 @@ class PB_Pistol : PB_WeaponBase
             TNT1 A 0 A_JumpIf(A_CheckAkimbo(), "ReadyToFireDualWield");
             TNT1 A 0 A_StartSound("IronSights", 0);
             TNT1 A 0 A_JumpIf(PB_GetZoom(),"Zoomout");
-            TNT1 A 0 A_ZoomFactor(1.25);
             D7GG BCD 1 setSilencerSprites("D8GG");
             D7GG EF 1;
-            TNT1 A 0 PB_SetZoom(true);
+            TNT1 A 0 PB_SetZoom(true,1.25);
             Goto Ready2;
 
         Zoomout:
-            TNT1 A 0 {	
-                PB_SetZoom(false);
-                A_ZoomFactor(1.0);
-            }
+            TNT1 A 0 PB_SetZoom(false);
             D7GG FED 1;
             D7GG CB 1 setSilencerSprites("D8GG");
             TNT1 A 0 PB_HandleCrosshair(43);
@@ -1135,7 +1130,6 @@ class PB_Pistol : PB_WeaponBase
                 TNT1 A 0 {
                     A_SetCrosshair(-1);
                     PB_SetZoom(false);
-                    A_ZoomFactor(1.0);
                     A_SetInventory("PB_LockScreenTilt",1);
 				    PB_ClearDualWield();
                     A_PlaySoundEx("PSRLOUT", "Auto");
@@ -1143,8 +1137,7 @@ class PB_Pistol : PB_WeaponBase
                 D6GA ABC 1 setSilencerSprites("D6GE");
                 D6GA DEFGHIJCCBA 1 setSilencerSprites("D6GE");
             RemoveBulletsDualWield1:
-                TNT1 A 0
-                {
+                TNT1 A 0 {
                     PB_UnloadMag(invoker.ammo2.getClassName(),invoker.ammo1.getClassName(),1,1,0,1);
                     PB_UnloadMag(invoker.ammo2.getClassName(),invoker.ammo1.getClassName(),1,1,0,0,"PB_LowCalRound");
                     PB_UnloadMag(invoker.ammoleft.getClassName(),invoker.ammo1.getClassName(),1,1,0,1);

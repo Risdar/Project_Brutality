@@ -1,16 +1,21 @@
 enum PB_HelpTipFlags {
-    PB_BRACE_TIP 			= 1 << 0, // This is inside BaseWeapon
-    PB_UNMAKER_TIP 			= 1 << 4,
-    PB_BERSERK_TIP 			= 1 << 6,
-    PB_RADSUIT_TIP 			= 1 << 7, // This is from powerups
-    PB_FLAMETHROWER_TIP 	= 1 << 8,
-    PB_CARBINE_TIP 			= 1 << 10,
-    PB_MG42_TIP 			= 1 << 11,
-    PB_BARREL_TIP3 			= 1 << 12, // bruh
-    PB_BARREL_TIP1 			= 1 << 13,
-    PB_BARREL_TIP2 			= 1 << 14,
-    PB_BFG_TIP 				= 1 << 15,
-    PB_RAILGUN_TIP 			= 1 << 16
+    PB_BRACE_TIP 			= 1 << 0,   // BaseWeapon_Functions.zsc
+    PB_DASH_TIP 			= 1 << 1,   // PlayerPawn.zc
+    // Why is it missing 0 << 2 ????
+    PB_EXECUTION_TIP 		= 1 << 3,   // pb_execution_handler.zs
+    PB_UNMAKER_TIP 			= 1 << 4,   // BaseWeapon_Functions.zsc
+    PB_ARMOR_TIP 			= 1 << 5,   // HPAPBase.zsc
+    PB_BERSERK_TIP 			= 1 << 6,   // Powerups.zsc
+    PB_RADSUIT_TIP 			= 1 << 7,   // Powerups.zsc
+    PB_FLAMETHROWER_TIP 	= 1 << 8,   // BaseWeapon_Functions.zsc
+    PB_REVOLVER_TIP 		= 1 << 9,   // Revolver.zs
+    PB_CARBINE_TIP 			= 1 << 10,  // BaseWeapon_Functions.zsc
+    PB_MG42_TIP 			= 1 << 11,  // BaseWeapon_Functions.zsc
+    PB_BARREL_TIP3 			= 1 << 12,  // BaseWeapon_Functions.zsc
+    PB_BARREL_TIP1 			= 1 << 13,  // BaseWeapon_Functions.zsc
+    PB_BARREL_TIP2 			= 1 << 14,  // BaseWeapon_Functions.zsc
+    PB_BFG_TIP 				= 1 << 15,  // BaseWeapon_Functions.zsc
+    PB_RAILGUN_TIP 			= 1 << 16   // BaseWeapon_Functions.zsc
 }
 
 // [gng] little help tip library i made for dox778's Vanilla Reloaded, but adapted for PB

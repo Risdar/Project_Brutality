@@ -76,25 +76,25 @@ extend class PB_WeaponBase
 	{
 		super.DoEffect();
 
+		// let pbweap = PB_WeaponBase(owner.player.ReadyWeapon);
+		// if(!pbweap) return;
+
 		if(PB_PixelRenderingFix)
 			WeaponScaleX = 1.2; //counter act 20% stretch (THE INTENDED PB VISUALS)
 		else
 			WeaponScaleX = 1.0; //garbo bullshit 4:3 forced rendering, will need to see about enabling this automatically if on 4:3 resolution
 
-		if(owner.FindInventory("HasBarrel")) 
-		{
+		if(owner.FindInventory("HasBarrel")) {
 			owner.SetInventory("HasBarrel",0);
 			owner.SetInventory("GrabbedBarrel",1);
 			owner.player.SetPSprite(PSP_WEAPON,resolvestate("ReadyBarrel"));
 		}
-		if(owner.FindInventory("HasFlameBarrel")) 
-		{
+		if(owner.FindInventory("HasFlameBarrel")) {
 			owner.SetInventory("HasFlameBarrel",0);
 			owner.SetInventory("GrabbedFlameBarrel",1);
 			owner.player.SetPSprite(PSP_WEAPON,resolvestate("ReadyFlameBarrel"));
 		}
-		if(owner.FindInventory("HasIceBarrel")) 
-		{
+		if(owner.FindInventory("HasIceBarrel")) {
 			owner.SetInventory("HasIceBarrel",0);
 			owner.SetInventory("GrabbedIceBarrel",1);
 			owner.player.SetPSprite(PSP_WEAPON,resolvestate("ReadyIceBarrel"));
@@ -109,6 +109,9 @@ extend class PB_WeaponBase
 			overheat 	 = clamp(overheat - 5, 0, maxOverheat);
 			leftOverheat = clamp(leftOverheat - 5, 0, maxOverheat);
 		}
+
+		if(owner.FindInventory("ToggleEquipment")) 
+			EQ_SwitchEquipment();
 	}
 
 	override void AttachToOwner(Actor Other)
@@ -130,99 +133,17 @@ extend class PB_WeaponBase
 			pdaweapContainer.CollectedWeapons.Push(self.GetClassName());
 			EventHandler.SendNetworkEvent("Foundweapon:"..self.GetClassName());
 		}*/
-		if(self is "PB_Flamethrower") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_FLAMETHROWER_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_FLAMETHROWER_TIP");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_FLAMETHROWER_TIP);
-			}
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP1, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_BARREL_TIP_1");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_BARREL_TIP1);
-			}
-		}
-		else if(self is "PB_Carbine") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_CARBINE_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_CARBINE_TIP");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_CARBINE_TIP);
-			}
-		}
-		else if(self is "PB_MG42") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_MG42_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_MG42_TIP");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_MG42_TIP);
-			}
-		}
-		else if(self is "PB_M2Plasma") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP3, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_BARREL_TIP_3");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_BARREL_TIP3);
-			}
-		}
-		else if(self is "PB_CryoRifle") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP2, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push("$PB_BARREL_TIP_2");
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_BARREL_TIP2);
-			}
-		}
-		else if(self is "PB_BFG9000") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BFG_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push(string.format(StringTable.Localize("$PB_BFG_TIP"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+reload")));
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_BFG_TIP);
-			}
-		}
-		else if(self is "PB_Railgun") 
-		{
-			if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_RAILGUN_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) 
-			{
-				Array<String> pbTipsBuf;
-				pbTipsBuf.Push(string.format(StringTable.Localize("$PB_RAILGUN_TIP"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+pb_specialwheel")));
-				PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_RAILGUN_TIP);
-			}
-		}
-		else if(self is "PB_Unmaker") 
-		{
-            if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_UNMAKER_TIP, CVar.GetCvar("pb_helpflags", players[consoleplayer])))
-            {
-                Array<String> pbTipsBuf;
-                pbTipsBuf.Push("$PB_UNMAKER_TIP_1");
-				pbTipsBuf.Push(string.format(StringTable.Localize("$PB_UNMAKER_TIP_2"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+pb_specialwheel")));
-                pbTipsBuf.Push("$PB_UNMAKER_TIP_3");
-                PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_UNMAKER_TIP);
-            }
-		}
+           
 	}
 
 	override state GetAtkState(bool hold)
 	{
 		if(owner.findinventory("GrabbedBarrel"))
 			return resolvestate("ThrowBarrel");
-
 		if(owner.findinventory("GrabbedFlameBarrel"))
 			return resolvestate("ThrowFlameBarrel");
-
 		if(owner.findinventory("GrabbedIceBarrel"))
 			return resolvestate("ThrowIceBarrel");
-
 		return super.GetAtkState(hold);
 	}
 	
@@ -230,13 +151,10 @@ extend class PB_WeaponBase
 	{
 		if(owner.findinventory("GrabbedBarrel"))
 			return resolvestate("PlaceBarrel");
-
 		if(owner.findinventory("GrabbedFlameBarrel"))
 			return resolvestate("PlaceFlameBarrel");
-
 		if(owner.findinventory("GrabbedIceBarrel"))
 			return resolvestate("PlaceIceBarrel");
-
 		return super.GetAltAtkState(hold);
 	}
 	
@@ -244,18 +162,15 @@ extend class PB_WeaponBase
 	{
 		if(owner.findinventory("GrabbedBarrel"))
 			return resolvestate("PlaceBarrel");
-
 		if(owner.findinventory("GrabbedFlameBarrel"))
 			return resolvestate("PlaceFlameBarrel");
-
 		if(owner.findinventory("GrabbedIceBarrel"))
 			return resolvestate("PlaceIceBarrel");
-
 		return super.GetDownState();
 	}
 
 //////////////////////////// READY FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
-	// Beef: I think this needs to be reworked lol
+	// [Beef] I think this needs to be reworked lol
 	action state A_DoPBWeaponAction(int weapflags = WRF_ALLOWRELOAD, int pbFlags = 0, bool noReload = false)
 	{
 		bool grabbedbarrel = IsHoldingBarrel();
@@ -412,14 +327,14 @@ extend class PB_WeaponBase
 		{
 			if(!PressingAltfire() || JustReleased(BT_ALTATTACK))
 				return ResolveState(zoomout);
-			if(PressingFire() && PressingAltfire() && ammoToCheck > 0)
+			if(PressingFire() && PressingAltfire() && ammoToCheck > invoker.ReserveToMagAmmoFactor)
 				return ResolveState(firezoom);
 			return A_DoPBWeaponAction(WRF_ALLOWRELOAD | WRF_NOSECONDARY);
 		}
 
-		if(PressingFire() && PressingAltfire() && ammoToCheck > 0)
+		if(PressingFire() && PressingAltfire() && ammoToCheck > invoker.ReserveToMagAmmoFactor)
 			return ResolveState(ads ? firezoom : fire);
-		if(PressingFire() && ammoToCheck > 0)
+		if(PressingFire() && ammoToCheck > invoker.ReserveToMagAmmoFactor)
 			return ResolveState(ads ? firezoom : fire);
 
 		return A_DoPBWeaponAction(WRF_ALLOWRELOAD);
@@ -435,7 +350,6 @@ extend class PB_WeaponBase
 			A_startsound(upSnd,32);	//play the select sound if defined
 		
 		A_setroll(0);
-		A_zoomfactor(1.0);
 		invoker.curBlood = (0,0,0);
 		
 		//this was in the SelectFirstPersonLegs state
@@ -458,9 +372,8 @@ extend class PB_WeaponBase
 		A_ClearOverlays(-999, -999);
 		A_Overlay(PSP_MELEEEQHANDLER, "Melee_Equipment_Handler_Overlay");
 		A_Overlay(PSP_KICKHANDLER, "KickHandler_Overlay");
-		A_Overlay(PSP_EQTOGGLEHANDLER, "Equipment_Toggle_Handler_Overlay");
 		invoker.WeaponScaleX = 1.0;
-		A_Overlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsStand");
+		A_Overlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 		invoker.WeaponScaleX = PB_PixelRenderingFix ? 1.2 : 1.0;
 		
 		PB_SetUsingKick(false);
@@ -468,6 +381,97 @@ extend class PB_WeaponBase
 		PB_SetUsingEquipment(false);
 		PB_SetExecutingEnemy(false);
 		PB_SetReloading(false);
+		PB_DoWeaponHelpText();
+	}
+
+	action void PB_DoWeaponHelpText()
+	{
+		let plr = self.player;
+		name wp = invoker.getClassName();
+
+		switch(wp)
+		{
+			case 'PB_Flamethrower':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_FLAMETHROWER_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_FLAMETHROWER_TIP");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_FLAMETHROWER_TIP);
+				}
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP1, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_BARREL_TIP_1");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_BARREL_TIP1);
+				}
+				break;
+
+			case 'PB_Carbine':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_CARBINE_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_CARBINE_TIP");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_CARBINE_TIP);
+				}
+				break;
+
+			case 'PB_MG42':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_MG42_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_MG42_TIP");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_MG42_TIP);
+				}
+				break;
+
+			case 'PB_M2Plasma':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP3, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_BARREL_TIP_3");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_BARREL_TIP3);
+				}
+				break;
+
+			case 'PB_CryoRifle':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BARREL_TIP2, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_BARREL_TIP_2");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_BARREL_TIP2);
+				}
+				break;
+
+			case 'PB_BFG9000':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_BFG_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push(string.format(StringTable.Localize("$PB_BFG_TIP"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+reload")));
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_BFG_TIP);
+				}
+				break;
+
+			case 'PB_Railgun':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_RAILGUN_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push(string.format(StringTable.Localize("$PB_RAILGUN_TIP"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+pb_specialwheel")));
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_RAILGUN_TIP);
+				}
+				break;
+
+			case 'PB_Unmaker':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_UNMAKER_TIP, CVar.GetCvar("pb_helpflags", players[consoleplayer])))
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_UNMAKER_TIP_1");
+					pbTipsBuf.Push(string.format(StringTable.Localize("$PB_UNMAKER_TIP_2"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+pb_specialwheel")));
+					pbTipsBuf.Push("$PB_UNMAKER_TIP_3");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_UNMAKER_TIP);
+				}
+				break;
+		}
+
 	}
 
 	action state PB_RespectIfNeeded()
@@ -815,7 +819,7 @@ extend class PB_WeaponBase
 	//[Pop] This is a hack, ideally we shouldnt have to do this and once weapons are fully ZScript each one
 	//will have its own function for firing that gets called. Even after it may be good to keep this for 
 	//weapon addons that stay in DECORATE. Thanks to ADMERAL for throwing this together.
-	// Beef: This will also crash if you're trying to shoot any projectiles that doesnt inherit PB_Projectile
+	// [Beef] This will also crash if you're trying to shoot any projectiles that doesnt inherit PB_Projectile
 	action void PB_FireBullets(string type, int amount, double angle, double offs, double height, double pitch)
 	{
 		vector2 spread;
@@ -956,7 +960,7 @@ extend class PB_WeaponBase
 			
 		return false,0;
 	}
-	
+
 	action bool PlayerForwardBack()
 	{
 		float direction;
@@ -999,111 +1003,87 @@ extend class PB_WeaponBase
 		return (owner.CountInv("PB_PowerStrength") >= 1);
 	}
 
+	// [Beef] you know we should really move from using hard coded states lol
 	// Used for interrupting the hand animation when kicking with melee attacks
 	action bool PB_MeleeKickInterruptCheck()
 	{
-		State PSPState = invoker.owner.player.GetPSprite(PSP_WEAPON).Curstate;
-		if( InStateSequence(PSPState,invoker.ResolveState("LeftJab")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftHook")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftUpperCut")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftBackHand")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightJab"))||
-			InStateSequence(PSPState,invoker.ResolveState("RightHook")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightUpperCut")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightBackHand")))
-			return true;
+		static const StateLabel meleeKickStates[] = {
+			"LeftJab", "LeftHook", "LeftUpperCut", "LeftBackHand",
+			"RightJab", "RightHook", "RightUpperCut", "RightBackHand"
+		};
+
+		for (int i = 0; i < meleeKickStates.Size(); i++)
+		{
+			if (InStateSequence(PB_GetWeaponState(PSP_WEAPON), invoker.ResolveState(meleeKickStates[i])))
+				return true;
+		}
 		return false;
 	}
 	
 	action bool PB_MeleeAttackKickCheck() 
 	{
-		State PSPState = invoker.owner.player.GetPSprite(PSP_WEAPON).Curstate;
-		if( InStateSequence(PSPState,invoker.ResolveState("LeftJab")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftHook")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftUpperCut")) ||
-			InStateSequence(PSPState,invoker.ResolveState("LeftBackHand")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightJab"))||
-			InStateSequence(PSPState,invoker.ResolveState("RightHook")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightUpperCut")) ||
-			InStateSequence(PSPState,invoker.ResolveState("RightBackHand")) ||
-			InStateSequence(PSPState,invoker.ResolveState("SideKickRight")) ||
-			InStateSequence(PSPState,invoker.ResolveState("SideKickLeft")) ||
-			InStateSequence(PSPState,invoker.ResolveState("HookKickLeft")) ||
-			InStateSequence(PSPState,invoker.ResolveState("ThrustKick")) ||
-			InStateSequence(PSPState,invoker.ResolveState("AirKickCombo")) ||
-			InStateSequence(PSPState,invoker.ResolveState("HookKickRight")))
-//			InStateSequence(PSPState,invoker.ResolveState("JavelinReadyToFire"))
-			return false;
+		static const StateLabel meleeAttackStates[] = {
+			"LeftJab", "LeftHook", "LeftUpperCut", "LeftBackHand",
+			"RightJab", "RightHook", "RightUpperCut", "RightBackHand",
+			"SideKickRight", "SideKickLeft","HookKickLeft","ThrustKick",
+			"AirKickCombo","HookKickRight"
+		};
+
+		for (int i = 0; i < meleeAttackStates.Size(); i++)
+		{
+			if (InStateSequence(PB_GetWeaponState(PSP_WEAPON), invoker.ResolveState(meleeAttackStates[i])))
+				return false;
+		}
 		return true;
-		
 	}
-	
+
 	action bool PB_WeaponIsInReadyState()
 	{
-		State PSPState = invoker.owner.player.GetPSprite(PSP_WEAPON).Curstate;
-		if ((InStateSequence(PSPState,invoker.ResolveState("Ready")) || 
-		  InStateSequence(PSPState,invoker.ResolveState("ReallyReady")) ||
-		  InStateSequence(PSPState,invoker.ResolveState("ReadyToFireDrum")) ||
-		  InStateSequence(PSPState,invoker.ResolveState("ReallyReady2Loop")) ||
-		  InStateSequence(PSPState,invoker.ResolveState("ReadyToFire"))||
-		  InStateSequence(PSPState,invoker.ResolveState("Ready2"))||
-		  InStateSequence(PSPState,invoker.ResolveState("Ready5"))||
-		  InStateSequence(PSPState,invoker.ResolveState("Ready4"))||
-		  InStateSequence(PSPState,invoker.ResolveState("ReallyReady3"))||
-		  InStateSequence(PSPState,invoker.ResolveState("ActuallyReady3"))||
-		  InStateSequence(PSPState,invoker.ResolveState("Ready3"))||
-		  InStateSequence(PSPState,invoker.ResolveState("JavelinReady3"))|| //Nailgun Gavelin Mode
-			InStateSequence(PSPState,invoker.ResolveState("ReadyToFire2"))|| //Hell Rifle Green mode
-			InStateSequence(PSPState,invoker.ResolveState("ReadyMissile"))|| //LMG Micro Missile mode
-			InStateSequence(PSPState,invoker.ResolveState("ReadyToFire_Red"))||
-			InStateSequence(PSPState,invoker.ResolveState("WeaponRespect"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashAirKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingStop"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingMissileStop"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingStopDrumMag"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashKickingDual"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashAirKickingDual"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingStopDual"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashBarrelKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashBarrelAirKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashBarrelSlideKickingStop")))
-		 ||
-		(InStateSequence(invoker.owner.player.GetPSprite(PSP_LEFTGUN).Curstate,invoker.ResolveState("IdleLeft_Overlay")) && 
-		 InStateSequence(invoker.owner.player.GetPSprite(PSP_RIGHTGUN).Curstate,invoker.ResolveState("IdleRight_Overlay")) && 
-		 (InStateSequence(PSPState,invoker.ResolveState("ReadyToFireDualWield")) ||
-		 InStateSequence(PSPState,invoker.ResolveState("ReadyDualWield")))))
-			return true;
-		return false;
-	}
+		static const StateLabel readyStates[] = {
+			"Ready", "ReallyReady", "ReadyToFireDrum", "ReallyReady2Loop",
+			"ReadyToFire", "Ready2", "Ready5", "Ready4",
+			"ReallyReady3", "ActuallyReady3", "Ready3",
+			"JavelinReady3",      // Nailgun Javelin mode
+			"ReadyToFire2",       // Hell Rifle Green mode
+			"ReadyMissile",       // LMG Micro Missile mode
+			"ReadyToFire_Red", "WeaponRespect",
+			"FlashKicking", "FlashAirKicking",
+			"FlashSlideKickingStop", "FlashSlideKickingMissileStop", "FlashSlideKickingStopDrumMag",
+			"FlashKickingDual", "FlashAirKickingDual", "FlashSlideKickingStopDual",
+			"FlashBarrelKicking", "FlashBarrelAirKicking", "FlashBarrelSlideKickingStop"
+		};
 	
+		for (int i = 0; i < readyStates.Size(); i++)
+		{
+			if (InStateSequence(PB_GetWeaponState(PSP_WEAPON), invoker.ResolveState(readyStates[i])))
+				return true;
+		}
+
+		// Dual-wield only counts as ready once both hands are in idle state
+		// and the weapon state itself is a dual-wield ready state.
+		bool leftIdle  = InStateSequence(PB_GetWeaponState(PSP_LEFTGUN),  invoker.ResolveState("IdleLeft_Overlay"));
+		bool rightIdle = InStateSequence(PB_GetWeaponState(PSP_RIGHTGUN), invoker.ResolveState("IdleRight_Overlay"));
+		bool dualReady = InStateSequence(PB_GetWeaponState(PSP_WEAPON),   invoker.ResolveState("ReadyToFireDualWield")) 
+					  || InStateSequence(PB_GetWeaponState(PSP_WEAPON),   invoker.ResolveState("ReadyDualWield"));
+
+		return leftIdle && rightIdle && dualReady;
+	}
+
 	action bool PB_WeaponIsInSlidingState()
 	{
-		State PSPState = invoker.owner.player.GetPSprite(PSP_WEAPON).Curstate;
-		if (InStateSequence(PSPState,invoker.ResolveState("FlashSlideKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingDW"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKicking2"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingDrumMag"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingMissile"))||
-			InStateSequence(PSPState,invoker.ResolveState("DualFlashSlideKicking"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingDual"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingAkimbo"))||
-			InStateSequence(PSPState,invoker.ResolveState("FlashSlideKickingDualWield"))||
-			InStateSequence(PSPState,invoker.ResolveState("DualWieldFlashSlideKicking"))
-		) return true;
+		static const StateLabel slideStates[] = {
+			"FlashSlideKicking", "FlashSlideKickingDW", "FlashSlideKicking2", "FlashSlideKickingDrumMag",
+			"FlashSlideKickingMissile", "DualFlashSlideKicking", "FlashSlideKickingDual", "FlashSlideKickingAkimbo",
+			"FlashSlideKickingDualWield", "DualWieldFlashSlideKicking"
+		};
+
+		for (int i = 0; i < slideStates.Size(); i++)
+		{
+			if (InStateSequence(PB_GetWeaponState(PSP_WEAPON), invoker.ResolveState(slideStates[i])))
+				return true;
+		}
 		return false;
 	}
-	
-	// action bool checkMG42()
-	// {
-	// 	let mg42 = pb_mg42(invoker);
-	// 	if(!mg42) return false;
-
-	// 	if(mg42 && mg42 is "PB_MG42" && mg42.barrelOverheating || mg42.hasOverheated && !IsHoldingBarrel())
-	// 		return true;
-	// 	return false;
-	// }
-
 	
 //////////////////////////// DUAL WIELD FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
 	// Yes I am that lazy
@@ -1272,6 +1252,12 @@ extend class PB_WeaponBase
 	}
 	
 //////////////////////////// HELPER FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+	// Used for checking the various states in a specific layer
+	action State PB_GetWeaponState(int layer = PSP_WEAPON)
+	{
+		return invoker.owner.player.GetPSprite(layer).Curstate;
+	}
+
 	//Special Modes
 	action string A_GetCurrentGrenadeType()
 	{
@@ -1336,10 +1322,14 @@ extend class PB_WeaponBase
 	}
 
 	// It would be nice if the zoomed token can be turned into variable inside baseweapon
-	action void PB_SetZoom(bool set)
+	action void PB_SetZoom(bool set, double str = 1.25, bool crosshairOverride = false)
 	{
 		A_SetInventory("Zoomed", set);
-		if(set == false) A_ZoomFactor(1.0);
+		A_ZoomFactor(set ? str : 1.0); // so the toggle and zoomfactor is in one line
+
+		// Will disable crosshair if zoom is true, unless the override is active
+		if(set == true && !crosshairOverride) 
+			A_SetCrosshair(-1);
 	}
 
 	action bool PB_GetZoom()
@@ -1486,13 +1476,13 @@ extend class PB_WeaponBase
 		}
 	}
 
-	// Beef: I want to put this inside PB_GetVisorBlood() but I see that in BaseWeapon_Melee this is used independently
+	// [Beef] I want to put this inside PB_GetVisorBlood() but I see that in BaseWeapon_Melee this is used independently
 	action bool PB_IsVisorBlood() 
 	{
 		return invoker.curBlood.x != 0 || invoker.curBlood.y != 0 || invoker.curBlood.z != 0;
 	}
 
-	// Beef: I think you should always check if there is actually blood on the visor before calling this
+	// [Beef] I think you should always check if there is actually blood on the visor before calling this
 	action int PB_GetVisorBlood()
 	{
 		double BR = invoker.curBlood.x;
@@ -1519,6 +1509,10 @@ extend class PB_WeaponBase
 			A_SetCrosshair(num); // Set crosshair to specific weapon
 		else
 			A_SetCrosshair(0); // Set crosshair to universal user setting
+
+		if(PB_GetZoom())
+			A_SetCrosshair(-1); // Disable crosshair when zoomed in
+		
 	}
 	
 	action void LedgeReach(float HeightDecrease)

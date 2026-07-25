@@ -193,7 +193,6 @@ class PB_MP40 : PB_WeaponBase
         PB_ClearDualWield();
         A_SetInventory("PB_LockScreenTilt",1);
         PB_HandleCrosshair(44);
-        A_ZoomFactor(1.0);
 
         if(A_CheckAkimbo())
             return ResolveState("StopDualWield");
@@ -251,7 +250,6 @@ class PB_MP40 : PB_WeaponBase
 			TNT1 A 0 PB_SetZoom(false);
 			TNT1 A 0 A_DestroyLaserPuff();
 			TNT1 A 0 A_Overlay(-9, "Null");
-			TNT1 A 0 A_ZoomFactor(1.0);
 			TNT1 A 0 A_JumpIf(A_CheckAkimbo(), "DeselectDualWield");
 			MPSE DCBA 1;
 			TNT1 A 0 A_Lower();
@@ -386,19 +384,12 @@ class PB_MP40 : PB_WeaponBase
 			TNT1 A 0 A_PlaySound("IronSights", 0);
 			TNT1 A 0 A_JumpIf(PB_GetZoom(), "Zoomout");
         ZoomIn:
-			TNT1 A 0 {
-				A_SetCrosshair(-1);
-				PB_SetZoom(true);
-				A_ZoomFactor(1.25);
-			}
+			TNT1 A 0 PB_SetZoom(true,1.25);
 			MPZO ABCD 1;
 			Goto Ready2;
 		
 		Zoomout:
-			TNT1 A 0{
-				PB_SetZoom(false);
-				A_ZoomFactor(1.0);
-			}
+			TNT1 A 0PB_SetZoom(false);
 			MPZO DCBA 1;
 			TNT1 A 0 PB_HandleCrosshair(44);
 			Goto Ready3;
@@ -714,9 +705,8 @@ class PB_MP40 : PB_WeaponBase
 			TNT1 A 0 PB_SetReloading(true);
 			TNT1 A 0 A_JumpIf(A_CheckAkimbo(),"UnloadDual");
 			TNT1 A 0 {
-				A_ZoomFactor(1.0);
 				A_SetCrosshair(-1);
-                PB_SetZoom(0);
+                PB_SetZoom(false);
 				A_PlaySoundEx("IronSights", "Auto");
 			}
 			MPR1 ABC 1;

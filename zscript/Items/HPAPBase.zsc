@@ -51,13 +51,13 @@ class PB_Armor : BasicArmorPickup abstract
             
             if((defenseDelta < 0) || (amountDelta < (SaveAmount * 0.2))) // armor is less defensive or 80% over it's full capacity
             {
-                if(!PB_HelpNotificationsHandler.CheckTipEvent(1 << 5, CVar.GetCvar("pb_helpflags", toucher.Player)))
+                if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_ARMOR_TIP, CVar.GetCvar("pb_helpflags", toucher.Player)))
                 {
                     Array<String> pbTipsBuf;
                     pbTipsBuf.Push("$PB_ARMOR_TIP_1");
                     pbTipsBuf.Push("$PB_ARMOR_TIP_2");
                     pbTipsBuf.Push("$PB_ARMOR_TIP_3");
-                    PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", 1 << 5);
+                    PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_ARMOR_TIP);
                 }
 
                 if(toucher.Player.cmd.buttons & BT_USE) 

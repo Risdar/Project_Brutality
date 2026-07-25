@@ -312,6 +312,12 @@ PB_SELECT_STUN      = "Equipment Selected: \cvStun Grenade";
 PB_SELECT_LEECH     = "Equipment Selected: \c[PB_DTech]Leech";
 PB_SELECT_REVGUN    = "Equipment Selected: \cnQuick Launcher";
 
+PB_NO_FRAG      = "No Frag Grenades Left";
+PB_NO_PROX      = "No Proximity Mines Left";
+PB_NO_STUN      = "No Stun Grenades Left";
+PB_NO_LEECH     = "Insufficient Demon Energy";
+PB_NO_REVGUN    = "No Quick Launcher Missiles Left";
+
 //Fists
 PB_FIST_NAME = "Fists";
 PB_FIST_TAG = "Bare Hands";

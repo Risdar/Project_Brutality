@@ -168,8 +168,8 @@ extend class PB_WeaponBase
 			TNT1 A 0 A_JumpIfInventory("PlayerIsDead",1,"FailOverlay");
 			TNT1 A 0 A_JumpIfHealthLower(0, "FailOverlay");
 			TNT1 A 0 {
-				A_LegOverlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsKickRight");
-				A_OverlayFlags(PSP_FIRSPERSONLEGS, PSPF_ADDWEAPON|PSPF_ADDBOB, False);
+				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsKickRight");
+				A_OverlayFlags(PSP_FIRSTPERSONLEGS, PSPF_ADDWEAPON|PSPF_ADDBOB, False);
 				A_OverlayOffset(PSP_DOKICK, 0, 32);
 				if(PB_GetZoom())
 					PB_SetZoom(false);
@@ -252,7 +252,7 @@ extend class PB_WeaponBase
 			}
 			TNT1 A 0 {
 				A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, false);
-				A_LegOverlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsStand");
+				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 				A_TakeInventory("Kicking",1);
 			}
 			Stop;
@@ -287,7 +287,7 @@ extend class PB_WeaponBase
 					A_Overlay(PSP_WEAPON, "FlashSlideKicking");
 					A_OverlayOffset(PSP_WEAPON, 0, 32);
 				}
-				A_ClearOverlays(PSP_FIRSPERSONLEGS,PSP_FIRSPERSONLEGS);
+				A_ClearOverlays(PSP_FIRSTPERSONLEGS,PSP_FIRSTPERSONLEGS);
 				A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, true);
 				A_OverlayOffset(PSP_DOKICK, 0, max(32, -pitch*2 + 32));
 			}
@@ -329,7 +329,7 @@ extend class PB_WeaponBase
 			SLDK OPQRSTU 1 A_OverlayOffset(PSP_DOKICK, 0, max(32, -pitch*2 + 32),WOF_INTERPOLATE);
 			TNT1 A 0 {
 				A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, false);
-				A_LegOverlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsStand");
+				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 				A_Takeinventory("Kicking",1);
 			}
 			Stop;
@@ -393,7 +393,7 @@ extend class PB_WeaponBase
 				A_Takeinventory("PB_LockScreenTilt",1);
 				A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, false);
 				PB_SetUsingKick(false);
-				A_LegOverlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsStand");
+				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 				A_TakeInventory("Kicking",1);
 			}
 			Stop;
@@ -430,13 +430,13 @@ extend class PB_WeaponBase
 				A_Takeinventory("PB_LockScreenTilt",1);
 				A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, false);
 				PB_SetUsingKick(false);
-				A_LegOverlay(PSP_FIRSPERSONLEGS, "FirstPersonLegsStand");
+				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 				A_TakeInventory("Kicking",1);
 			}
 			Stop;
 		GrabEnemy:	
 			TNT1 A 0 {
-				A_ClearOverlays(PSP_FIRSPERSONLEGS,65);
+				A_ClearOverlays(PSP_FIRSTPERSONLEGS,65);
 				A_StartSound("weapons/fistwhoosh");
 			}
 			PKUP ABCDEF 1;

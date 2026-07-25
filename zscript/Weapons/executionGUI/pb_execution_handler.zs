@@ -84,13 +84,13 @@ class pb_ExecutionHandler : EventHandler
 		{
 			if(actorCanBeExecuted(target) && getTargetDistance() < 200)
 			{
-                if(!PB_HelpNotificationsHandler.CheckTipEvent(1 << 3, CVar.GetCvar("pb_helpflags", players[consoleplayer])))
+                if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_EXECUTION_TIP, CVar.GetCvar("pb_helpflags", players[consoleplayer])))
                 {
                     Array<String> pbTipsBuf;
                     pbTipsBuf.Push("$PB_EXECUTION_TIP_1");
 					pbTipsBuf.Push(string.format(StringTable.Localize("$PB_EXECUTION_TIP_2"), PB_HelpNotificationsHandler.PB_FormatKeybinds("+user2")));
                     pbTipsBuf.Push("$PB_EXECUTION_TIP_3");
-                    PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", 1 << 3);
+                    PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_EXECUTION_TIP);
                 }
 				draw(target, event);
 			}

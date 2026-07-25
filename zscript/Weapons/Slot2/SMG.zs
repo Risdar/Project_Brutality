@@ -252,7 +252,6 @@ class PB_SMG : PB_WeaponBase
     {
         A_SetInventory("GoWeaponSpecialAbility", 0);
         PB_SetZoom(false);
-        A_ZoomFactor(1.0);
         PB_ClearDualWield();
 
         bool selectBurst    = CountInv("SelectBurstFireSMG")  > 0;
@@ -891,11 +890,7 @@ class PB_SMG : PB_WeaponBase
             TNT1 A 0 A_PlaySound("IronSights", 0);
             TNT1 A 0 A_JumpIf(PB_GetZoom(),"Zoomout");
         ZoomIn:
-            TNT1 A 0 {
-                A_SetCrosshair(-1);
-                A_ZoomFactor(1.25);
-                PB_SetZoom(true);
-            }
+            TNT1 A 0 PB_SetZoom(true,1.25);
             TNTI A 0 {
                 if(getSilencer()) A_Overlay(SILENCER_OVERLAY, "AimSilencerOverlay");
             }
@@ -903,10 +898,7 @@ class PB_SMG : PB_WeaponBase
             Goto Ready2;
             
         Zoomout:
-            TNT1 A 0 {
-                PB_SetZoom(false);
-                A_ZoomFactor(1.0);
-            }
+            TNT1 A 0 PB_SetZoom(false);
             A1F3 ED 1;
             TNTI A 0 {
                 if(getSilencer()) A_Overlay(SILENCER_OVERLAY, "AimOutSilencerOverlay");
@@ -1564,7 +1556,6 @@ class PB_SMG : PB_WeaponBase
 //////////////////////////// UNLOAD ////////////////////////////////////////////////////////////////////////////////////
             Unload:
             TNT1 A 0 {
-                A_ZoomFactor(1.0);
                 A_SetCrosshair(-1);
                 A_SetInventory("PB_LockScreenTilt",1);
                 A_StartSound("weapons/smg/raise");

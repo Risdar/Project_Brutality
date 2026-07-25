@@ -26,10 +26,10 @@ Class PB_Revolver : PB_WeaponBase
 	override void AttachToOwner(Actor Other)
 	{
 		Super.AttachToOwner(other);
-		if(!PB_HelpNotificationsHandler.CheckTipEvent(1 << 9, CVar.GetCvar("pb_helpflags", Other.Player))) {
+		if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_REVOLVER_TIP, CVar.GetCvar("pb_helpflags", Other.Player))) {
 			Array<String> pbTipsBuf;
 			pbTipsBuf.Push("$PB_REVOLVER_TIP");
-			PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", 1 << 9);
+			PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_REVOLVER_TIP);
 		}
 	}
 	

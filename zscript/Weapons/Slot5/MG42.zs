@@ -248,7 +248,6 @@ class PB_MG42 : PB_WeaponBase
 			TNT1 A 0 {
 				A_Overlay(SELECT_OVERLAY,"DeselectFlash");
 				PB_SetZoom(false);
-				A_ZoomFactor(1.0);
 				A_PlaySoundEx("weapons/changing", "Auto");
 				A_Overlay(SELECT_OVERLAY,"DeselectBelt");
 			}
@@ -377,11 +376,9 @@ class PB_MG42 : PB_WeaponBase
 		AltFire:
 		TNT1 A 0 A_JumpIf(PB_GetZoom(), "Unzoom");
 		TNT1 A 0 {
-			PB_SetZoom(true);
+			PB_SetZoom(true,1.25);
 			A_PlaySoundEx("IronSights", "Auto");
 			A_Overlay(5, "BeltZoomFlash");
-			A_ZoomFactor(1.25);
-			A_SetCrosshair(-1);
 		}
 		MRGZ BCD 1;
 		Goto Ready2;
@@ -391,7 +388,6 @@ class PB_MG42 : PB_WeaponBase
 			PB_SetZoom(false);
 			A_PlaySoundEx("IronSights", "Auto");
 			A_Overlay(BELT_OVERLAY, "BeltUnzoomFlash");
-			A_ZoomFactor(1.0);
 			PB_HandleCrosshair(50);
 		}
 		MRGZ DCB 1;
@@ -436,7 +432,6 @@ class PB_MG42 : PB_WeaponBase
 				PB_SetZoom(false);
 				A_PlaySoundEx("IronSights", "Auto");
 				A_Overlay(BELT_OVERLAY, "BeltUnzoomFlash");
-				A_ZoomFactor(1.0);
 				PB_HandleCrosshair(50);
 			}
 			MRGZ DCB 1;
@@ -480,7 +475,6 @@ class PB_MG42 : PB_WeaponBase
 				PB_SetZoom(false);
 				A_PlaySoundEx("IronSights", "Auto");
 				A_Overlay(BELT_OVERLAY, "BeltUnzoomFlash");
-				A_ZoomFactor(1.0);
 				A_PlaySound("MG42HEAT");
 				PB_HandleCrosshair(50);
 			}

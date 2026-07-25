@@ -50,6 +50,8 @@ class PlayerPawnBase : PlayerPawn
 	
 	Array<String> CollectedWeapons, BaseWeapons;
 
+	int selectedEquipment; // Equipment
+
 	array<int> oldPTics;
   	array<int> oldPUTics;
 	
@@ -1803,13 +1805,13 @@ class PlayerPawnBase : PlayerPawn
 				EventHandler.SendInterfaceEvent(PlayerNumber(), "PB_DashWhatchamacallit");
 				A_StartSound("player/dash", 69, CHANF_OVERLAP);
 				
-				if(!PB_HelpNotificationsHandler.CheckTipEvent(1 << 1, CVar.GetCvar("pb_helpflags", Player))) {
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_DASH_TIP, CVar.GetCvar("pb_helpflags", Player))) {
 					Array<String> pbDashTips;
 					pbDashTips.Push("$PB_DASH_TIP_1");
 					pbDashTips.Push("$PB_DASH_TIP_2");
 					pbDashTips.Push("$PB_DASH_TIP_3");
 					pbDashTips.Push("$PB_DASH_TIP_4");
-					PB_HelpNotificationsHandler.PB_SendTipArray(pbDashTips, "pb_helpflags", 1 << 1);
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbDashTips, "pb_helpflags",PB_DASH_TIP);
 				}
 				SetInventory("PlayerDashed", 1);
 				A_QuakeEx(2, 2, 2, dashTics, 0, 1, "", QF_SCALEDOWN, rollintensity:0.2);
