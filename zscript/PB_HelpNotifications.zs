@@ -8,7 +8,7 @@ enum PB_HelpTipFlags {
     PB_BERSERK_TIP 			= 1 << 6,   // Powerups.zsc
     PB_RADSUIT_TIP 			= 1 << 7,   // Powerups.zsc
     PB_FLAMETHROWER_TIP 	= 1 << 8,   // BaseWeapon_Functions.zsc
-    PB_REVOLVER_TIP 		= 1 << 9,   // Revolver.zs
+    PB_REVOLVER_TIP 		= 1 << 9,   // BaseWeapon_Functions.zsc
     PB_CARBINE_TIP 			= 1 << 10,  // BaseWeapon_Functions.zsc
     PB_MG42_TIP 			= 1 << 11,  // BaseWeapon_Functions.zsc
     PB_BARREL_TIP3 			= 1 << 12,  // BaseWeapon_Functions.zsc

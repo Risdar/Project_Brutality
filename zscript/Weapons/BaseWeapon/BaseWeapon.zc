@@ -63,6 +63,8 @@ class PB_WeaponBase : DoomWeapon
 	property OffsetRecoilY: verticalOffsetRecoil;
 	
 	bool alreadyRespected;
+
+	bool stayInEmptyLayer;
 	
 	//Cemtex's PB_AmmoIntoMag function variables
 	string AmmoMag;
@@ -211,6 +213,7 @@ class PB_WeaponBase : DoomWeapon
 	
 	enum PB_OverlayLayers {
 		PSP_LEDGEGRAB					= 1000,
+		PSP_SWITCH_EQUIPMENT_LAYER 		= 834,
 		PSP_LEFTGUN						= 10,
 		PSP_RIGHTGUN					= 11,
 		FLASH_LAYER						= -3,
@@ -219,7 +222,6 @@ class PB_WeaponBase : DoomWeapon
 		PSP_REVENANTLAUNCHERLAYER		= -85,
 		PSP_LEECHBEAMLAYER				= -86,
 		PSP_MELEEEQHANDLER				= -777,
-		PSP_KICKHANDLER					= -778,
 		PSP_QUICKMELEEBLOOD				= -997,
 		PSP_QUICKMELEE					= -998,
 		PSP_DOKICK						= -999,
@@ -586,23 +588,25 @@ class PB_WeaponBase : DoomWeapon
 					}
 				}
 				Loop;
-		KickHandler_Overlay:
-			TNT1 A 1 {
-				if(CountInv("ResetKick")>=1)
-				{
-					A_TakeInventory("ResetKick", 1);
-					PB_SetUsingKick(false);
-					A_TakeInventory("Kicking", 1);
-				}
-				if(CountInv("Grabbing_A_Ledge")==0 && CountInv("Kicking")==0 && ((JustPressed(BT_USER4) || player.crouchdir == -1 && CountInv("CanSlideKick") == 1) && !PB_usingKick() && !PB_executingEnemy() && PB_MeleeAttackKickCheck()))
-				{
-					PB_SetUsingKick(true);
-					A_LegOverlay(PSP_DOKICK, "DoKick");
-					A_OverlayFlags(PSP_DOKICK,PSPF_ADDWEAPON|PSPF_ADDBOB, False);
-					A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, true);
-				}
-			}
-			Loop;
+		// [Beef] this is actually unused since I've moved it to DoEffect()
+		// but I'll keep this here
+		// KickHandler_Overlay:
+		// 	TNT1 A 1 {
+		// 		if(CountInv("ResetKick")>=1)
+		// 		{
+		// 			A_TakeInventory("ResetKick", 1);
+		// 			PB_SetUsingKick(false);
+		// 			A_TakeInventory("Kicking", 1);
+		// 		}
+		// 		if(CountInv("Grabbing_A_Ledge")==0 && CountInv("Kicking")==0 && ((JustPressed(BT_USER4) || player.crouchdir == -1 && CountInv("CanSlideKick") == 1) && !PB_usingKick() && !PB_executingEnemy() && PB_MeleeAttackKickCheck()))
+		// 		{
+		// 			PB_SetUsingKick(true);
+		// 			A_LegOverlay(PSP_DOKICK, "DoKick");
+		// 			A_OverlayFlags(PSP_DOKICK,PSPF_ADDWEAPON|PSPF_ADDBOB, False);
+		// 			A_OverlayFlags(PSP_DOKICK,PSPF_PLAYERTRANSLATED, true);
+		// 		}
+		// 	}
+		// 	Loop;
 		// Initialize Weapon upon selection
 		GoingToReady:
 			TNT1 A 0 A_JumpIfInventory ("HasBarrel", 1, "ReadyBarrel");
@@ -645,7 +649,6 @@ class PB_WeaponBase : DoomWeapon
 				A_Takeinventory("RandomHeadExploder",1);
 				A_TakeInventory("DualFireReload",2);
 				A_Overlay(PSP_MELEEEQHANDLER, "Melee_Equipment_Handler_Overlay");
-				A_Overlay(PSP_KICKHANDLER, "KickHandler_Overlay");
 				A_LegOverlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 				A_ClearOverlays(PSP_DOKICK, PSP_DOKICK);
 				PB_SetUsingKick(false);
@@ -831,6 +834,11 @@ class PB_WeaponBase : DoomWeapon
 
 		Steady:
 			Goto GoingToReady;
+
+		// [Beef] so addon makers can play their custom animations using CustomInventory
+		EmptyLayer:
+			TNT1 A 1 A_JumpIf(!invoker.stayInEmptyLayer,"GoingToReady2");
+			Loop;
 	}
 }
 

@@ -3,6 +3,8 @@
 // that way the equipment will be consistent across weapons
 // the actual equipment use still uses an empty overlay inside BaseWeapon.zc but it does call the EQ_UseEquipment() here
 
+// Big thanks to Pope (ThePopeOfDope) for some the switch equipment animations since I took them from his Project Survival 
+
 // TODO: Move the whole equipment system to a CustomInventory to reduce bloat in the BaseWeapon,
 // this way we wont need the variable in PlayerPawn.zc
 // either by making an eventhandler that works as an interface between the weapon and the CustomInventory or just by getting a pointer to it 
@@ -128,19 +130,22 @@ extend class PB_WeaponBase
 
 		string showText;
 		string playSound;
+		Statelabel st;
 		switch(tokens)
 		{
-			case FRAG_GRENADE: 	showText = "$PB_SELECT_FRAG";	playSound = "GRNPIN";				break;	
-			case PROX_MINE: 	showText = "$PB_SELECT_PROX";	playSound = "GRNPIN";				break;	
-			case STUN_GRENADE:	showText = "$PB_SELECT_STUN";	playSound = "StunGrenadePickup";	break;	
-			case LEECH: 		showText = "$PB_SELECT_LEECH";	playSound = "SiphonGrowl";			break;	
-			case REV_GUN: 		showText = "$PB_SELECT_REVGUN";	playSound = "REVUP";				break;	
+			case FRAG_GRENADE: 	showText = "$PB_SELECT_FRAG";	playSound = "GRNPIN";			 st = "EQ_FragSwitch";   break;	
+			case PROX_MINE: 	showText = "$PB_SELECT_PROX";	playSound = "GRNPIN";			 st = "EQ_ProxSwitch";   break;	
+			case STUN_GRENADE:	showText = "$PB_SELECT_STUN";	playSound = "StunGrenadePickup"; st = "EQ_StunSwitch";   break;	
+			case LEECH: 		showText = "$PB_SELECT_LEECH";	playSound = "SiphonGrowl";		 st = "EQ_LeechSwitch";  break;	
+			case REV_GUN: 		showText = "$PB_SELECT_REVGUN";	playSound = "REVUP";			 st = "EQ_RevGunSwitch"; break;	
 		}
 		
 		EQ_SetEquipment(tokens);
 		owner.A_Print(showText); 
 		owner.A_StartSound(playSound, 3);
 		EQ_ClearGearboxTokens();
+		owner.player.SetPSprite(PSP_SWITCH_EQUIPMENT_LAYER,resolvestate(st));
+		owner.player.SetPSprite(PSP_WEAPON,owner.player.readyweapon.resolvestate("FlashPunching"));
 	}
 
 	void EQ_ClearGearboxTokens()
@@ -214,10 +219,10 @@ extend class PB_WeaponBase
 			}
 			HND1 KLMNOPQ 1 A_SetRoll(roll-5.0);
 			TNT1 A 0 {
-			A_SetRoll(0, SPF_INTERPOLATE);
-			A_TakeInventory("UseEquipment", 1);
-			A_TakeInventory("ToggleEquipment", 1);
-			A_TakeInventory("PlayerIsThrowingAGrenade", 1);
+				A_SetRoll(0, SPF_INTERPOLATE);
+				A_TakeInventory("UseEquipment", 1);
+				A_TakeInventory("ToggleEquipment", 1);
+				A_TakeInventory("PlayerIsThrowingAGrenade", 1);
 			}
 			TNT1 A 0 A_JumpIf(PressingUser1(), "UseEquipment");
 			Goto GoingToReady2;
@@ -241,6 +246,10 @@ extend class PB_WeaponBase
 			TNT1 A 0 A_JumpIf(PressingUser1(), "UseEquipment");
 			Goto GoingToReady2;
 
+		EQ_FragSwitch:
+			EQFR MLKJAAAAAAJKLM 1;
+			Stop;
+
 //////////////////////////// PROXIMITY MINE ////////////////////////////////////////////////////////////////////////////////////
 		ThrowMine:
 			XPFF FEDCBA 1;
@@ -258,13 +267,16 @@ extend class PB_WeaponBase
 			TNT1 A 0 A_JumpIf(PressingUser1(), "UseEquipment");
 			Goto GoingToReady2;
 
+		EQ_ProxSwitch:
+			XPFB ABCDEEEEEEEDCBA 1;
+			Stop;
+
 //////////////////////////// STUN GRENADE ////////////////////////////////////////////////////////////////////////////////////
 		ThrowStun:
 			STNG BCDEF 1;
 			STNG F 1 Offset(-2,34);
 			TNT1 A 0 A_StartSound("StunGrenadeArm", 2);
 			STNG GIJJJIHGKLMNOP 1;
-			
 			HND1 I 1 A_StartSound("THRGRN", 1);
 			TNT1 A 0 A_TakeInventory("PB_StunGrenadeAmmo", 1, TIF_NOTAKEINFINITE);
 			HND1 J 1 A_FireProjectile("PB_ThrownStunGrenade",0,0,0,0,0,0);
@@ -275,6 +287,10 @@ extend class PB_WeaponBase
 			}
 			TNT1 A 0 A_JumpIf(PressingUser1(), "UseEquipment");
 			Goto GoingToReady2;
+
+		EQ_StunSwitch:
+			SHIG QRSTUVVVVUTSRQ 1;
+			Stop;
 
 //////////////////////////// LEECH ////////////////////////////////////////////////////////////////////////////////////
 		LeechBeam:
@@ -309,6 +325,12 @@ extend class PB_WeaponBase
 			}
 			TNT1 A 0 A_JumpIf(PressingUser1(), "UseEquipment");
 			Goto GoingToReady2;
+
+		EQ_LeechSwitch:
+			SYNP KLMN 1;
+			SYNP GHIJ 4;
+			SYNP NMLK 1;
+			Stop;
 		
 //////////////////////////// REV GUN ////////////////////////////////////////////////////////////////////////////////////
 		// This is an overlay
@@ -390,6 +412,8 @@ extend class PB_WeaponBase
 			RVCA FDCB 1;
 			stop;
 		
-		
+		EQ_RevGunSwitch:
+			RVC1 DCBAAAAAAAABCD 1;
+			Stop;
 	}
 }

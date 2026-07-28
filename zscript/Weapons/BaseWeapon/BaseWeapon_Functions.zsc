@@ -76,8 +76,10 @@ extend class PB_WeaponBase
 	{
 		super.DoEffect();
 
-		// let pbweap = PB_WeaponBase(owner.player.ReadyWeapon);
-		// if(!pbweap) return;
+		if(!owner || !owner.player) return;
+		
+		let weap = owner.player.ReadyWeapon;
+		if(!weap) return;
 
 		if(PB_PixelRenderingFix)
 			WeaponScaleX = 1.2; //counter act 20% stretch (THE INTENDED PB VISUALS)
@@ -110,8 +112,12 @@ extend class PB_WeaponBase
 			leftOverheat = clamp(leftOverheat - 5, 0, maxOverheat);
 		}
 
+		// Handles Equipment Change
 		if(owner.FindInventory("ToggleEquipment")) 
 			EQ_SwitchEquipment();
+
+		// Handles Kick
+		PB_KickHandler();
 	}
 
 	override void AttachToOwner(Actor Other)
@@ -136,6 +142,7 @@ extend class PB_WeaponBase
            
 	}
 
+	// These three overrides are usedd for placing/throwing barrels
 	override state GetAtkState(bool hold)
 	{
 		if(owner.findinventory("GrabbedBarrel"))
@@ -170,6 +177,28 @@ extend class PB_WeaponBase
 	}
 
 //////////////////////////// READY FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+	// [Beef] this looks horrible ngl
+	void PB_KickHandler()
+	{
+		if(owner.CountInv("ResetKick")>=1)
+		{
+			owner.A_TakeInventory("ResetKick", 1);
+			self.usingKick = false;
+			owner.A_TakeInventory("Kicking", 1);
+		}
+		if(owner.CountInv("Grabbing_A_Ledge")==0 
+			&& owner.CountInv("Kicking")==0 
+			&& ((owner.player.cmd.buttons & BT_USER4 && !(owner.player.oldbuttons & BT_USER4) || owner.player.crouchdir == -1 
+			&& owner.CountInv("CanSlideKick") == 1) 
+			&& !self.usingKick && !self.executingEnemy && PB_MeleeAttackKickCheck()))
+		{
+			self.usingKick = true;
+			self.WeaponScaleX = 1.0;
+			owner.player.SetPSprite(PSP_DOKICK,owner.player.readyweapon.resolvestate("DoKick"));
+			self.WeaponScaleX = PB_PixelRenderingFix ? 1.2 : 1.0;
+		}
+	}
+
 	// [Beef] I think this needs to be reworked lol
 	action state A_DoPBWeaponAction(int weapflags = WRF_ALLOWRELOAD, int pbFlags = 0, bool noReload = false)
 	{
@@ -313,7 +342,7 @@ extend class PB_WeaponBase
 		return null;
 	}
 
-	// Function for weapons that have both dual wield and ads, just enable the ads if its called in ready2
+	// Function for weapons that have both dual wield and ads
 	action state PB_ReadyFire(
 		statelabel fire     = "Fire",
 		statelabel firezoom = "Fire2",
@@ -371,7 +400,6 @@ extend class PB_WeaponBase
 		
 		A_ClearOverlays(-999, -999);
 		A_Overlay(PSP_MELEEEQHANDLER, "Melee_Equipment_Handler_Overlay");
-		A_Overlay(PSP_KICKHANDLER, "KickHandler_Overlay");
 		invoker.WeaponScaleX = 1.0;
 		A_Overlay(PSP_FIRSTPERSONLEGS, "FirstPersonLegsStand");
 		invoker.WeaponScaleX = PB_PixelRenderingFix ? 1.2 : 1.0;
@@ -384,6 +412,7 @@ extend class PB_WeaponBase
 		PB_DoWeaponHelpText();
 	}
 
+	// Shows helptext for specific weapons
 	action void PB_DoWeaponHelpText()
 	{
 		let plr = self.player;
@@ -403,6 +432,15 @@ extend class PB_WeaponBase
 					Array<String> pbTipsBuf;
 					pbTipsBuf.Push("$PB_BARREL_TIP_1");
 					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags", PB_BARREL_TIP1);
+				}
+				break;
+
+			case 'PB_Revolver':
+				if(!PB_HelpNotificationsHandler.CheckTipEvent(PB_REVOLVER_TIP, CVar.GetCvar("pb_helpflags", plr))) 
+				{
+					Array<String> pbTipsBuf;
+					pbTipsBuf.Push("$PB_REVOLVER_TIP");
+					PB_HelpNotificationsHandler.PB_SendTipArray(pbTipsBuf, "pb_helpflags",PB_REVOLVER_TIP);
 				}
 				break;
 
@@ -474,6 +512,7 @@ extend class PB_WeaponBase
 
 	}
 
+	// Check if the WeaponRespect animation should play
 	action state PB_RespectIfNeeded()
 	{
 		//A_Log("PB_RespectIfNeeded");
@@ -586,6 +625,8 @@ extend class PB_WeaponBase
 	}
 		
 //////////////////////////// RELOAD FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
+	// Reload/Unload functions and everything related to the staged reloads is here
+
 	//put this in the beginning of the reload state
 	//	-emptyReload is meant for guns that have different reloads when its empty, if its not the case just pass null (without "")
 	//	-fullAlready is the state it jumps if its already full, usually just ready3. for dual weapons, the right weapon should use this to skip its reload and go to the left weapon.
@@ -593,7 +634,6 @@ extend class PB_WeaponBase
 	//	-full is the amount considered for the gun to be full
 	//	-equal is the equivalence between the ammo reserve and a single bullet/shell/whateverammouses loaded
 	//	-dual use this if you want to check the left weapon instead
-
 	//check for ammo in the gun, do necessary functions
 	action state PB_CheckReload(statelabel unloadedReload,statelabel emptyReload,statelabel loadChamber,statelabel fullAlready,statelabel noAmmo,int full,int equal = 1,bool dual = false)
 	{
@@ -1086,7 +1126,7 @@ extend class PB_WeaponBase
 	}
 	
 //////////////////////////// DUAL WIELD FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
-	// Yes I am that lazy
+	// [Beef] Yes I am that lazy
 	action void PB_ClearDualWield()
 	{
 		A_ClearOverlays(PSP_LEFTGUN, PSP_RIGHTGUN);

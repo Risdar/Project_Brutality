@@ -74,8 +74,12 @@ class PB_LMG : PB_WeaponBase
 
 	const ZOOM_LAYER = 2;
     const ZOOM_CONTINUE_LAYER = FLASH_LAYER;
+	
+    const RELOAD_LAYER = ZOOM_LAYER;
 
 	const BELT_LAYER = 4;
+	
+	const BELT_RECHAMBER_LAYER = 5;
 
 //////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////
     action void setMicroMissile(bool set)
@@ -100,11 +104,9 @@ class PB_LMG : PB_WeaponBase
 		bool mode 				= inMicroMissileMode();
 		bool ads 				= PB_GetZoom();
 		name projectile 		= mode ? "PB_MicroMissileProjectile" : "PB_556x45mm";
-		name sound 				= mode ? "LMISFIR" : "LFIRE";
+		string snd 				= mode ? "LMISFIR" : "LFIRE";
 		name casing 			= mode ? "LMGCasingRocket"    : "LMGCasingStandard";
 		name belt 				= mode ? "LMGMissileBeltLink" : "LMGBeltLink";
-		StateLabel flashSt 		= mode ? "MuzzleFlashRocket"  : "MuzzleFlashBullet"
-		StateLabel beltSt 		= mode ? "BeltFireMissile"    : "BeltFireBullet";
 		double recoilX 			= mode ? -0.30 : -0.60;
 		double recoilY 			= mode ? -0.26 : -0.55;
 		double xOfs 			= ads  ?    19 : 23;
@@ -130,12 +132,20 @@ class PB_LMG : PB_WeaponBase
 			A_FireCustomMissile("YellowFlareSpawn", 0, 0, 0, 0);
 		}
 
-		A_StartSound(sound, CHAN_Weapon, CHANF_DEFAULT, 1.0);
+		A_StartSound(snd, CHAN_Weapon, CHANF_DEFAULT, 1.0);
 		PB_FireBullets(projectile, 1, 1, 0, 0, 1);
 
 		A_Overlay(RECOIL_LAYER, "FireRecoil");
-		A_FlashOverlay(FLASH_LAYER, flashSt);
-		A_Overlay(BELT_LAYER, beltSt);
+		if(inMicroMissileMode())
+		{
+			A_FlashOverlay(FLASH_LAYER, "MuzzleFlashRocket");
+			A_Overlay(BELT_LAYER, "BeltFireMissile");
+		}
+		else
+		{
+			A_FlashOverlay(FLASH_LAYER, "MuzzleFlashBullet");
+			A_Overlay(BELT_LAYER, "BeltFireBullet");
+		}
 
 		PB_SpawnCasing(casing, xOfs, horOfs, vertOfs, 0, frandom(3,5), frandom(0,4), false);
 		PB_SpawnCasing(belt, xOfs, horOfs, vertOfs, 0, frandom(1,3), frandom(0,4), false);		
@@ -155,8 +165,8 @@ class PB_LMG : PB_WeaponBase
 
 	// All in one set sprite function
     action void LMG_SetSprite(
-		name l1, 
-		name l2, 
+		name l1, // Is used for the bullet mode when simple mode is active
+		name l2, // same as above but missile mode
 		name l3 = "", 
 		name l4 = "" , 
 		name l5 = "", 
@@ -166,26 +176,25 @@ class PB_LMG : PB_WeaponBase
     {
         name spriteToUse;
         int ammo = invoker.ammo1.amount;
-		int mode = inMicroMissileMode()
+		int mode = inMicroMissileMode();
 
 		// Change sprite depending on ammo level
         if(mode) // If in missile mode check these amounts
         {
-            if		(ammo >= 7) spriteToUse = l1;
+			if		(ammo >= 18) spriteToUse = l1;
+            else if (ammo <= 15) spriteToUse = l2;
+            else if (ammo <= 12) spriteToUse = l3;
+            else if (ammo <= 9)	 spriteToUse = l4;
+            else			     spriteToUse = l5;
+        }
+        else // If in bullet mode check these
+        {
+			if		(ammo >= 7) spriteToUse = l1;
             else if (ammo == 6) spriteToUse = l2;
             else if (ammo == 5) spriteToUse = l3;
             else if (ammo == 4)	spriteToUse = l4;
             else if (ammo <= 3)	spriteToUse = l5;
             else				spriteToUse = l6;
-
-        }
-        else // If in bullet mode check these
-        {
-            if		(ammo >= 18) spriteToUse = l1;
-            else if (ammo <= 15) spriteToUse = l2;
-            else if (ammo <= 12) spriteToUse = l3;
-            else if (ammo <= 9)	 spriteToUse = l4;
-            else			     spriteToUse = l5;
         }
 
 		// If simple mode is active then 
@@ -199,28 +208,48 @@ class PB_LMG : PB_WeaponBase
 
 	action state LMG_JumpState(StateLabel l1, StateLabel l2, StateLabel l3, StateLabel l4, StateLabel l5 = null, StateLabel l6 = null)
     {
-        StateLabel state;
+        StateLabel st;
         int ammo = invoker.ammo1.amount;
 
-        if(inMicroMissileMode())
+        if(!inMicroMissileMode())
         {
-            if		(ammo >= 7) state = l1;
-            else if (ammo == 6) state = l2;
-            else if (ammo == 5) state = l3;
-            else if (ammo == 4)	state = l4;
-            else if (ammo <= 3)	state = l5;
-            else				state = l6;
+            if		(ammo >= 7) st = l1;
+            else if (ammo == 6) st = l2;
+            else if (ammo == 5) st = l3;
+            else if (ammo == 4)	st = l4;
+            else if (ammo <= 3)	st = l5;
+            else				st = l6;
         }
         else
         {
-            if		(ammo >= 18) state = l1;
-            else if (ammo <= 15) state = l2;
-            else if (ammo <= 12) state = l3;
-            else if (ammo <= 9)	 state = l4;
-            else			     state = l5;
+            if		(ammo >= 18) st = l1;
+            else if (ammo <= 15) st = l2;
+            else if (ammo <= 12) st = l3;
+            else if (ammo <= 9)	 st = l4;
+            else			     st = l5;
         }
 
-        return resolveState(state);
+        return resolveState(st);
+    }
+
+	action void LMG_SetSprite_6to3(
+		name l1, 
+		name l2, 
+		name l3 = "", 
+		name l4 = "" , 
+		name l5 = "")
+    {
+        name spriteToUse;
+        int ammo = invoker.ammo1.amount;
+
+		if		(ammo >= 6) spriteToUse = l1;
+		else if (ammo == 5) spriteToUse = l2;
+		else if (ammo == 4) spriteToUse = l3;
+		else if (ammo <= 3)	spriteToUse = l4;
+		else				spriteToUse = l5;
+
+        if(spriteToUse != "")
+            A_SetWeaponSpriteEx(spriteToUse);
     }
 
     action void LMG_HandleCrosshair()
@@ -232,7 +261,7 @@ class PB_LMG : PB_WeaponBase
     }
 
 	// The scale in fire recoil overlay is turned into a formula
-	double getRecoilScale(int tic)
+	action double getRecoilScale(int tic)
 	{
 		double scale = 1.1 - (0.025 * tic);
 		return max(scale, 1.0);
@@ -240,7 +269,7 @@ class PB_LMG : PB_WeaponBase
 
 	// This is wack ngl
 	// Basically returns an offset based on what tic the overlay is currently in
-	int getRecoilOffset(int variant, int tic)
+	action int getRecoilOffset(int variant, int tic)
 	{
 		if (tic == 4) return 0;
 		if (tic == 3) return -1;
@@ -305,7 +334,7 @@ class PB_LMG : PB_WeaponBase
             LBA7 A 0; LBA6 A 0; LBA5 A 0; LBA4 A 0;
             ALB7 A 0; ALB6 A 0; ALB5 A 0; ALB4 A 0;
 
-            LLMU A 0;
+            LLMU A 0; 
             LAFB A 0;
             LAFR A 0;
             LSM6 A 0; LSM5 A 0; LSM4 A 0; LSM3 A 0;
@@ -313,6 +342,13 @@ class PB_LMG : PB_WeaponBase
             LQM6 A 0; LQM5 A 0; LQM4 A 0; LQM3 A 0;
             LMA6 A 0; LMA5 A 0; LMA4 A 0; LMA3 A 0;
             ALM6 A 0; ALM5 A 0; ALM4 A 0; 
+
+            LBR1 A 0; LBR2 A 0; LBR3 A 0; LBR4 A 0;
+            LMR1 A 0; LMR2 A 0; LMR3 A 0; LMR4 A 0;
+
+			RELB A 0; RELM A 0;
+			LBM1 A 0; LBM2 A 0;
+			LBR1 A 0; LMR2 A 0;
 
 			LB71 A 0; LB61 A 0; LB51 A 0; LB41 A 0;
 			LB31 A 0; LB21 A 0; LB11 A 0; 
@@ -326,12 +362,16 @@ class PB_LMG : PB_WeaponBase
 			LBS1 A 0; LB97 A 0; LB98 A 0; LB99 A 0; LB90 A 0;
 			LMS1 A 0; LM86 A 0; LM85 A 0; LM84 A 0;
 
+			LGAF A 0; LRAF A 0;
+			LBAT A 0; LMAT A 0;
+
+			LMGF A 0; LMMF A 0;
 
         WeaponRespect:
 			TNT1 A 0 {
 				A_StartSound("weapons/smg_up", 0);
 				A_SetCrosshair(-1);
-			};
+			}
 			LSM6 ABCD 1 A_DoPBWeaponAction();
 			LMRP AAAAABCDE 1 A_DoPBWeaponAction();
 			TNT1 A 0 A_StartSound("LINSP ", 2);
@@ -351,7 +391,6 @@ class PB_LMG : PB_WeaponBase
 			Goto Ready3;
 
         Deselect:
-            TNT1 A 0 //A_SetCrosshair(0)
 			TNT1 A 0 A_Setinventory("RandomHeadExploder",0);
 			TNT1 A 0 A_Setinventory("Unloading",0);
 			TNT1 A 0 A_Setinventory("Reloading",0);
@@ -371,11 +410,11 @@ class PB_LMG : PB_WeaponBase
 			TNT1 AAAAAAAAAAAAAAAAAA 0 A_Lower();
 			Wait;
 		UnloadedDeselect:
-			LUSB EDCBA 1 LMG_SetSprite("LUSB","LUSM",simpleMode = true);
+			LUSB EDCBA 1 LMG_SetSprite("LUSB","LUSM",simpleMode:true);
 			Goto CompletelyDeselect;
 
 		UnloadedSelect:
-			LUSB ABCDE 1 LMG_SetSprite("LUSB","LUSM",simpleMode = true);
+			LUSB ABCDE 1 LMG_SetSprite("LUSB","LUSM",simpleMode:true);
 			Goto ReadyUnload;
 
         Select:
@@ -393,10 +432,10 @@ class PB_LMG : PB_WeaponBase
 			AU2M ABCD 1 {
                 if(inMicroMissileMode())
                     LMG_SetSprite("LSM6","LSM5","LSM4","LSM3");
-                else
+                else 
                     LMG_SetSprite("LSB7","LSB6","LSB5","LSB4","LSB3");
             }
-            jumpIfMicroMissile("ReadyMissile");
+            TNT1 A 0 jumpIfMicroMissile("ReadyMissile");
             // Fallthrough to Ready
 //////////////////////////// READY ////////////////////////////////////////////////////////////////////////////////////
         Ready3:
@@ -411,14 +450,7 @@ class PB_LMG : PB_WeaponBase
 			LSB7 E 1 {
                 PB_CoolDownBarrel();
 				if(inMicroMissileMode())
-				{
-					name spriteToUse;
-					if (invoker.ammo2.amount >= 6 ) spriteToUse = "LSM6";
-					if (invoker.ammo2.amount <= 5 ) spriteToUse = "LSM5";
-					if (invoker.ammo2.amount <= 4 ) spriteToUse = "LSM4";
-					if (invoker.ammo2.amount <= 3 ) spriteToUse = "LSM3";
-					A_SetWeaponSprite(spriteToUse);
-				}
+					LMG_SetSprite_6to3("LSM6","LSM5","LSM4","LSM3");
                 else
                     LMG_SetSprite("LSB7","LSB6","LSB5","LSB4","LSB3");
 
@@ -428,7 +460,7 @@ class PB_LMG : PB_WeaponBase
 
         ReadyUnload:
 			"####" Q 1 { 
-				LMG_SetSprite("LLBU","LLMU",simpleMode = true);
+				LMG_SetSprite("LLBU","LLMU",simpleMode:true);
                 return A_WeaponReady(WRF_ALLOWRELOAD | WRF_NOSECONDARY); 
             }
 			Loop;
@@ -438,14 +470,7 @@ class PB_LMG : PB_WeaponBase
 			"####" Q 1 {
 				PB_CoolDownBarrel(0, 0, 6);
 				if(inMicroMissileMode())
-				{
-					name spriteToUse;
-					if (invoker.ammo2.amount >= 6 ) spriteToUse = "LMA6";
-					if (invoker.ammo2.amount <= 5 ) spriteToUse = "LMA5";
-					if (invoker.ammo2.amount <= 4 ) spriteToUse = "LMA4";
-					if (invoker.ammo2.amount <= 3 ) spriteToUse = "LMA3";
-					A_SetWeaponSprite(spriteToUse);
-				}
+					LMG_SetSprite_6to3("LMA6","LMA5","LMA4","LMA3");
                 else
                     LMG_SetSprite("LBA7","LBA6","LBA5","LBA4","LBA4");
 				return PB_ReadyFire();
@@ -458,24 +483,24 @@ class PB_LMG : PB_WeaponBase
 			TNT1 A 0 A_JumpIf(PB_GetZoom(),"Fire2");
 			TNT1 A 0 LMG_Fire();
 			LMGF A 1 BRIGHT {
-				LMG_SetSprite("LMGF","LMMF",simpleMode = true);
-				Offset(0,0);
+				LMG_SetSprite("LMGF","LMMF",simpleMode:true);
+				// A_WeaponOffset(0,0);
 			}
 			TNT1 A 0 A_WeaponReady(WRF_NOPRIMARY|WRF_NOBOB);
 			TNT1 A 0 A_ZoomFactor(1.0);
 			LMGF B 1 BRIGHT {
-				LMG_SetSprite("LMGF","LMMF",simpleMode = true);
-				Offset(0,35);
+				LMG_SetSprite("LMGF","LMMF",simpleMode:true);
+				// A_WeaponOffset(0,35);
 			}
 			TNT1 A 0 A_WeaponReady(WRF_NOPRIMARY|WRF_NOBOB);
 			LMGF C 1 {
-				LMG_SetSprite("LMGF","LMMF",simpleMode = true);
-				Offset(0,34);
+				LMG_SetSprite("LMGF","LMMF",simpleMode:true);
+				// A_WeaponOffset(0,34);
 			}
 			TNT1 A 0 A_WeaponReady(WRF_NOPRIMARY|WRF_NOBOB);
 			LMGF D 1 {
-				LMG_SetSprite("LMGF","LMMF",simpleMode = true);
-				Offset(0,33);
+				LMG_SetSprite("LMGF","LMMF",simpleMode:true);
+				// A_WeaponOffset(0,33);
 			}
 			TNT1 A 0 A_WeaponReady(WRF_NOPRIMARY|WRF_NOBOB);
 			TNT1 A 0 A_JumpIf(!inMicroMissileMode(),"Ready3"); // Early jump if not in Micro Missile
@@ -493,27 +518,19 @@ class PB_LMG : PB_WeaponBase
 		Fire2:
 			TNT1 A 0 PB_JumpIfNoAmmo(chamber:false);
 			TNT1 A 0 LMG_Fire();
-			LGAF B 1 BRIGHT LMG_SetSprite("LGAF","LRAF",simpleMode = true);
+			LGAF B 1 BRIGHT LMG_SetSprite("LGAF","LRAF",simpleMode:true);
 			TNT1 A 0 A_ZoomFactor(1.23);
-			LGAF C 1 BRIGHT LMG_SetSprite("LGAF","LRAF",simpleMode = true);
+			LGAF C 1 BRIGHT LMG_SetSprite("LGAF","LRAF",simpleMode:true);
 			TNT1 A 0 A_ZoomFactor(1.25);
-			LGAF DA 1 LMG_SetSprite("LGAF","LRAF",simpleMode = true);
+			LGAF DA 1 LMG_SetSprite("LGAF","LRAF",simpleMode:true);
 			TNT1 A 0 jumpIfMicroMissile("ContinueFire2"); // Play some extra animation if in Missile Mode
 			TNT1 A 0 PB_ReadyFire();
 			Goto Ready2;
 
 		ContinueFire2:
-			"####" Q 1 {
-				// This is an exception
-				name spriteToUse;
-				if (invoker.ammo2.amount >= 18 ) spriteToUse = "LMA6";
-				if (invoker.ammo2.amount >= 15 ) spriteToUse = "LMA5";
-				if (invoker.ammo2.amount >= 12 ) spriteToUse = "LMA4";
-				if (invoker.ammo2.amount <  12 ) spriteToUse = "LMA3";
-				A_SetWeaponSprite(spriteToUse);
-			}
+			"####" Q 1 LMG_SetSprite_6to3("LMA6","LMA5","LMA4","LMA3");
 			TNT1 A 0 PB_ReadyFire();
-			Goto Ready2Micro
+			Goto Ready2;
 
 //////////////////////////// ALTFIRE ////////////////////////////////////////////////////////////////////////////////////
 		AltFire:
@@ -525,9 +542,9 @@ class PB_LMG : PB_WeaponBase
 				LMG_HandleCrosshair();
 				A_Overlay(ZOOM_LAYER, "ZoomOverlay");
 			}
-			"####" AB 1 LMG_SetSprite("LBAT","LMAT",simpleMode = true);
+			"####" AB 1 LMG_SetSprite("LBAT","LMAT",simpleMode:true);
 			"####" A 0 A_Overlay(ZOOM_CONTINUE_LAYER, "ZoomOverlayContinue");
-			"####" CD 1 LMG_SetSprite("LBAT","LMAT",simpleMode = true);
+			"####" CD 1 LMG_SetSprite("LBAT","LMAT",simpleMode:true);
 			Goto Ready2;
 		Unzoom:
 			"####" A 0 {
@@ -535,9 +552,9 @@ class PB_LMG : PB_WeaponBase
 				PB_SetZoom(false);
 				A_Overlay(ZOOM_CONTINUE_LAYER, "UnZoomOverlayContinue");
 			}
-			"####" DC 1 LMG_SetSprite("LBAT","LMAT",simpleMode = true);
+			"####" DC 1 LMG_SetSprite("LBAT","LMAT",simpleMode:true);
 			"####" A 0 A_Overlay(ZOOM_LAYER, "UnZoomOverlay");
-			"####" BA 1 LMG_SetSprite("LBAT","LMAT",simpleMode = true);
+			"####" BA 1 LMG_SetSprite("LBAT","LMAT",simpleMode:true);
 			Goto Ready3;
 
 //////////////////////////// WEAPON SPECIAL ////////////////////////////////////////////////////////////////////////////////////
@@ -644,11 +661,13 @@ class PB_LMG : PB_WeaponBase
 			TNT1 A 0 A_Overlay(ZOOM_LAYER, "BeltReloadRocketGive6");
 			LLMU FEDCBARSTUV 1 A_DoPBWeaponAction();
 			Goto ReloadLidClosing;
+
 		BarrelSwitchBGoNormal:
 			LBM1 ABCD 1 A_DoPBWeaponAction();
 			LMR2 KK 1 A_DoPBWeaponAction();
 			LMR2 A 0 A_JumpIf(invoker.ammo1.amount >= 7, "ReloadBulletInsert");
 			Goto BarrelSwitchGiveEmptyClipBM;
+
 		BarrelSwitchBMNormalReload:
 			LBMR GHIJ 1 A_DoPBWeaponAction();
 			"####" A 0 A_StartSound("", 2);
@@ -707,7 +726,6 @@ class PB_LMG : PB_WeaponBase
 					
 				return ResolveState(null);
 			}
-			TNT1 A 0
 			TNT1 A 0 {
 				if (invoker.ammo2.amount >= 21 && invoker.ammo1.amount >= 21) 
 					return  ResolveState ("BarrelSwitchMBNormalReload");
@@ -777,18 +795,235 @@ class PB_LMG : PB_WeaponBase
 			}
 			LRMR OPQR 1 A_DoPBWeaponAction();
 			LBR2 IIIII 1 A_DoPBWeaponAction();
-			LBR2 A 0 A_JumpIfInventory(invoker.ammo1.amount >= 8, "ReloadBulletInsert");
+			LBR2 A 0 A_JumpIf(invoker.ammo1.amount >= 8, "ReloadBulletInsert");
 		BarrelSwitchGiveEmptyClipMB:
 			LBR2 IIIII 1 A_DoPBWeaponAction();
 			LBR2 HGFE 1 A_DoPBWeaponAction();
 			"####" A 0 A_StartSound("weapons/lmg/magin", 4) ;
-			LBR2 DCBA 1 A_DoPBWeaponAction()
+			LBR2 DCBA 1 A_DoPBWeaponAction();
 			Goto ReloadLidClosing;
 //////////////////////////// RELOAD ////////////////////////////////////////////////////////////////////////////////////
+		Reload:
+			TNT1 A 0 PB_CheckReload(
+				"ReloadUnloaded",
+				null,
+				"BoltReset",
+				"Ready3",
+				"Ready3",
+				inMicroMissileMode() ? MAGAZINE_SIZE/2 : MAGAZINE_SIZE,
+				invoker.ReserveToMagAmmoFactor);
+		ReloadBegin:
+			TNT1 A 0 A_Overlay(RELOAD_LAYER, "BeltReload");
+			"####" ABCDEFGHI 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+			"####" A 0 A_StartSound("LLIDOP");
+			"####" JKLMNOPQRS 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+			"####" A 0 jumpIfMicroMissile("MissileReload");
+			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 8, "ReloadNormally");
+		ReloadBulletLess8:
+			"####" A 0 A_Overlay(RELOAD_LAYER, "BeltReloadBulletGet7");
+			LLBU AAABCDEFGHHHH 1;
+			TNT1 A 0 A_JumpIf(invoker.ammo2.amount >= 8, "ReloadBulletLess8GoNormal");
+			TNT1 A 0 {
+				PB_AmmoIntoMag(invoker.ammo2.getClassName(),invoker.ammo1.getClassName(),MAGAZINE_SIZE);
+				PB_SetMagUnloaded(false);
+				PB_SetMagEmpty(false);
+			}
+			LLBU HGF 1;
+			TNT1 A 0 A_Overlay(RELOAD_LAYER, "BeltReloadBulletGive7");
+			LLBU EDCBARSTUV 1;
+			Goto ReloadLidClosing;
+
+		ReloadBulletLess8GoNormal:
+			LLBU IJKLLL 1;
+			"####" A 0 {
+				A_StartSound("weapons/sgl/detach", 3);
+				PB_SpawnCasing("EmptyLMGMag", 12, -2.5, 10.25,frandom(2,5),frandom(1,3),frandom(2,4));
+				PB_SetMagUnloaded(true);
+			}
+			LLBU MNOPQ 1;
+			LLBU QQ 1;
+			LBM2 ABCD 1;
+			LBR2 A 0 ;
+			Goto ReloadLoop;
+		MissileReload:
+			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 7, "ReloadNormally");
+		ReloadMissileLess6:
+			LLMU AAABCDEFGHHHH 1;
+		ReloadRocketLess6Continue:
+			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 7, "ReloadRocketLess6GoNormal");
+			TNT1 A 0 {
+				PB_SpawnCasing("EmptyLMGMag", 12, -2.5, 10.25,frandom(2,5),frandom(1,3),frandom(2,4));
+				PB_SetMagUnloaded(true);
+			}
+			LLMU HGF 1;
+			TNT1 A 0 A_Overlay(RELOAD_LAYER, "BeltReloadRocketGive6");
+			LLMU EDCBARSTUV 1;
+			Goto ReloadLidClosing;
+
+		ReloadRocketLess6GoNormal:
+			LLMU IJKLLL 1;
+			"####" A 0 {
+				A_StartSound("weapons/sgl/detach", 3);
+				PB_SetMagUnloaded(true);
+			}
+			LLMU MNOPQ 1 ;
+			TNT1 A 0 PB_SpawnCasing("EmptyLMGMissileMag", 12, -2.5, 10.25,frandom(2,5),frandom(1,3),frandom(2,4));
+			LLMU QQ 1;
+			LBM2 ABCD 1;
+			Goto ReloadLoop;
+
+		ReloadNormally:
+			"####" STU 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+		ReloadNormallyGotClip:
+			"####" VWXYZ 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+			"####" A 0 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+			"####" ABCD 1 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+			"####" A 0 {
+				A_StartSound("weapons/sgl/detach", 3);
+				PB_SetMagUnloaded(true);
+			}
+		ReloadBulletContinue:
+			"####" EFGHIJKLMN 1 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+		ReloadBulletInsert:
+		ReloadLoop:
+		ReloadBullletInsertAnim:
+			"####" OP 1 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+			"####" A 0 A_StartSound("weapons/lmg/magin", 4) ;
+			"####" QRSTUVWXYZ 1 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+			"####" A 0 A_StartSound("weapons/riflemagslap", 5);
+			"####" ABCDEFGHIJKLMNOPQR 1 LMG_SetSprite("LBR3","LMR3",simpleMode:true);
+			"####" A 0 A_StartSound("LFEED");
+			"####" STUVWXYZ 1 LMG_SetSprite("LBR3","LMR3",simpleMode:true);
+			"####" AB 1 LMG_SetSprite("LBR4","LMR4",simpleMode:true);
+		ReloadLidClosing:
+			"####" A 0 A_Overlay(RELOAD_LAYER, "BeltLidClosing");
+			"####" CDEFGH 1 LMG_SetSprite("LBR4","LMR4",simpleMode:true);
+			"####" A 0 {
+				A_StartSound("LLIDCL");
+				PB_AmmoIntoMag(
+					invoker.ammo2.getClassName(),
+					invoker.ammo1.getClassName(),
+					inMicroMissileMode() ? MAGAZINE_SIZE/2 : MAGAZINE_SIZE,
+					invoker.ReserveToMagAmmoFactor);
+				PB_SetMagUnloaded(false);
+				PB_SetMagEmpty(false);
+			}
+			"####" IJKLMNOPQR 1 LMG_SetSprite("LBR4","LMR4",simpleMode:true);
+			"####" A 0 A_Setinventory("CantWeaponSpecial",0);
+			Goto BoltReset;
+
+		BoltReset:
+			TNT1 A 0 A_JumpIf(PB_GetChamberEmpty(), 2);
+			Goto Ready3;
+			TNT1 A 0;
+			TNT1 A 0;
+			TNT1 A 0 A_Overlay(BELT_RECHAMBER_LAYER, "BeltRechamber");
+			TNT1 A 0 PB_SetChamberEmpty(false);
+			"####" ABCDEF 1 LMG_SetSprite("RELB","RELM",simpleMode:true);
+			"####" A 0 A_StartSound("IronSights", 1);
+			"####" A 0 A_StartSound("LMGCLK", 2);
+			"####" GHIJKLMNOPQR 1 LMG_SetSprite("RELB","RELM",simpleMode:true);
+			"####" A 0 A_Setinventory("GoWeaponSpecialAbility",0);
+			Goto Ready3;
+
 //////////////////////////// UNLOAD ////////////////////////////////////////////////////////////////////////////////////
+		Unload:
+			TNT1 A 0 A_Overlay(RELOAD_LAYER, "BeltReload");
+			"####" ABCDEFGHI 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+			"####" A 0 A_StartSound("LLIDOP");
+			"####" JKLMNOPQRS 1 LMG_SetSprite("LBR1","LMR1",simpleMode:true);
+			"####" A 0 {
+				If (inMicroMissileMode)
+					A_Overlay(RELOAD_LAYER, "BeltReloadRocketGet6");
+				else
+					A_Overlay(RELOAD_LAYER, "BeltReloadBulletGet7");
+			}
+			"####" AAABCDEFGHHHH 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			"####" IJKLLLL 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			"####" A 0 {
+				A_StartSound("weapons/sgl/detach", 3);
+
+				PB_UnloadMag(
+					invoker.ammo2.getClassName(),
+					invoker.ammo1.getClassName(),
+					invoker.ReserveToMagAmmoFactor,
+					1,0,0,
+					"PB_HighCalBox"
+				);
+				
+				if(PB_GetMagEmpty()) 
+					PB_SpawnCasing("EmptyLMGMag", 12, -2.5, 10.25,frandom(2,5),frandom(1,3),frandom(2,4));
+
+				PB_SetMagUnloaded(true);
+				PB_SetMagEmpty(true);
+			}
+			"####" MNOPQQQ 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			Goto ReadyUnload;
+
+		ReloadUnloaded:
+			TNT1 A 0 {
+				if (invoker.ammo1.amount >= inMicroMissileMode() ? 7 : 8)
+					return resolveState("UnloadedClipIn");
+				return resolveState(null);
+			}
+			"####" PONM 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			"####" A 0 A_StartSound("weapons/lmg/magin", 2);
+			"####" LLLLKJIHHHH 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			"####" HGF 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			"####" A 0 {
+				if(inMicroMissileMode())
+					A_Overlay(RELOAD_LAYER, "BeltReloadRocketGive6");			
+				else
+					A_Overlay(RELOAD_LAYER, "BeltReloadBulletGive7");
+			}
+			"####" EDCBARSTUV 1 LMG_SetSprite("LLBU","LLMU",simpleMode:true);
+			Goto ReloadLidClosing;
+
+		UnloadedClipIn:
+			"####" ABCD 1 LMG_SetSprite("LBM2","LBM1",simpleMode:true);
+			"####" A 0 LMG_SetSprite("LBR2","LMR2",simpleMode:true);
+			Goto ReloadBulletInsert;
+
 //////////////////////////// FLASH STATES ////////////////////////////////////////////////////////////////////////////////////
 		StopOverlay: //just for fun lmfao
 			TNT1 A 1;
+			Stop;
+
+		// Belt Rechamber
+		BeltRechamber:
+			RELM A 0 jumpIfMicroMissile("BeltRechamberRocket");
+			R8LB A 0 A_JumpIfInventory("LMGAMMO", 8, 6);
+			R8LB A 0 A_JumpIfInventory("LMGAMMO", 7, 5);
+			R6LB A 0 A_JumpIfInventory("LMGAMMO", 6, 4);
+			R5LB A 0 A_JumpIfInventory("LMGAMMO", 5, 3);
+			R4LB A 0 A_JumpIfInventory("LMGAMMO", 4, 2);
+			TNT1 A 0;
+			"####" A 0;
+			"####" ABCDEFFF 1;
+			R8LB A 0 A_JumpIfInventory("LMGAMMO", 8, 6);
+			R7LB A 0 A_JumpIfInventory("LMGAMMO", 7, 5);
+			R7LB A 0 A_JumpIfInventory("LMGAMMO", 6, 4);
+			R6LB A 0 A_JumpIfInventory("LMGAMMO", 5, 3);
+			R5LB A 0 A_JumpIfInventory("LMGAMMO", 4, 2);
+			TNT1 A 0;
+			"####" G 1;
+			"####" HIJKKKLMN 1;
+			Stop;
+		BeltRechamberRocket:
+			R7LM A 0 A_JumpIfInventory("LMGAMMO", 7, 5);
+			R7LM A 0 A_JumpIfInventory("LMGAMMO", 6, 4);
+			R5LM A 0 A_JumpIfInventory("LMGAMMO", 5, 3);
+			R4LM A 0 A_JumpIfInventory("LMGAMMO", 4, 2);
+			TNT1 A 0;
+			"####" A 0;
+			"####" ABCDEFFF 1;
+			R7LM A 0 A_JumpIfInventory("LMGAMMO", 7, 5);
+			R7LM A 0 A_JumpIfInventory("LMGAMMO", 6, 4);
+			R6LM A 0 A_JumpIfInventory("LMGAMMO", 5, 3);
+			R5LM A 0 A_JumpIfInventory("LMGAMMO", 4, 2);
+			TNT1 A 0;
+			"####" A 0;
+			"####" GHIJKKKLMN 1;
 			Stop;
 
 		// Bullet Reload
@@ -798,7 +1033,7 @@ class PB_LMG : PB_WeaponBase
 			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 4, "BeltReloadBulletMain");
 			Goto BeltReloadBulletLess4;
 		BeltReloadBulletMain:
-			"####" A 0 A_LMGTierSprite("LB", "1", invoker.ammo2.amount, 4, 7);
+			"####" A 0 LMG_BeltSprite("LB", "1", invoker.ammo2.amount, 4, 7);
 			"####" ABCDEFFFGHIJKKKKKK 1;
 			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 8, "BeltReloadBullet8");
 			Goto BeltReloadBulletGet7;
@@ -806,10 +1041,10 @@ class PB_LMG : PB_WeaponBase
 		BeltReloadBulletLess4:
 			TNT1 A 0 A_JumpIf(invoker.ammo2.amount < 1, "StopOverlay");
 			TNT1 AAAAAAAAAA 1;
-			TNT1 A 0 A_LMGTierSprite("LB", "1", invoker.ammo2.amount, 1, 3);
+			TNT1 A 0 LMG_BeltSprite("LB", "1", invoker.ammo2.amount, 1, 3);
 			"####" ABCCCCCC 1;
 		BeltReloadBulletGet7:
-			TNT1 A 0 A_LMGTierSprite("LLB", "", invoker.ammo2.amount, 1, 7);
+			TNT1 A 0 LMG_BeltSprite("LLB", "", invoker.ammo2.amount, 1, 7);
 			"####" ABCD 1;
 			"####" A 0 {
 				if (invoker.ammo2.amount >= 1)
@@ -821,7 +1056,7 @@ class PB_LMG : PB_WeaponBase
 			Stop;
 
 		BeltReloadBulletGive7:
-			TNT1 A 0 A_LMGTierSprite("LLB", "", invoker.ammo2.amount, 1, 7);
+			TNT1 A 0 LMG_BeltSprite("LLB", "", invoker.ammo2.amount, 1, 7);
 			"####" HGF 1;
 			"####" A 0 {
 				if (invoker.ammo2.amount >= 1)
@@ -851,11 +1086,11 @@ class PB_LMG : PB_WeaponBase
 			Goto BeltReloadRocketLess6;
 
 		BeltReloadMissileMain:
-			"####" A 0 A_LMGTierSprite("LM", "1", invoker.ammo2.amount, 4, 6);
+			"####" A 0 LMG_BeltSprite("LM", "1", invoker.ammo2.amount, 4, 6);
 			"####" ABCDEFFFGHIJKKKKKK 1;
 			"####" A 0 A_JumpIf(invoker.ammo2.amount >= 7, "BeltReloadRocket7");
 		BeltReloadRocketGet6:
-			TNT1 A 0 A_LMGTierSprite("LLM", "", invoker.ammo2.amount, 1, 6);
+			TNT1 A 0 LMG_BeltSprite("LLM", "", invoker.ammo2.amount, 1, 6);
 			"####" ABCD 1;
 			"####" A 0 {
 				if (invoker.ammo2.amount >= 1)
@@ -867,7 +1102,7 @@ class PB_LMG : PB_WeaponBase
 			Stop;
 
 		BeltReloadRocketGive6:
-			TNT1 A 0 A_LMGTierSprite("LLM", "", invoker.ammo2.amount, 1, 6);
+			TNT1 A 0 LMG_BeltSprite("LLM", "", invoker.ammo2.amount, 1, 6);
 			"####" HGF 1;
 			"####" A 0 {
 				if (invoker.ammo2.amount >= 1)
@@ -889,12 +1124,12 @@ class PB_LMG : PB_WeaponBase
 			Goto BeltLidBulletLess4;
 		BeltLidBulletMain:
 			LB71 A 0 A_JumpIf(invoker.ammo1.amount + invoker.ammo2.amount >= 7, "BeltBulletLidMore7");
-			TNT1 A 0 A_LMGTierSprite("LB", "1", invoker.ammo1.amount + invoker.ammo2.amount, 4, 7);
+			TNT1 A 0 LMG_BeltSprite("LB", "1", invoker.ammo1.amount + invoker.ammo2.amount, 4, 7);
 			"####" LMNPQRSTUUUUVWXY 1;
 			Stop;
 
 		BeltLidBulletLess4:
-			TNT1 A 0 A_LMGTierSprite("LB", "1", invoker.ammo1.amount + invoker.ammo2.amount, 1, 3);
+			TNT1 A 0 LMG_BeltSprite("LB", "1", invoker.ammo1.amount + invoker.ammo2.amount, 1, 3);
 			"####" DEGHI 1;
 			Stop;
 
@@ -916,7 +1151,7 @@ class PB_LMG : PB_WeaponBase
 			Stop;
 
 		BeltLidRocketLess4:
-			TNT1 A 0 A_LMGTierSprite("LM", "1", (invoker.ammo1.amount + invoker.ammo2.amount / 2) / 6, 1, 3);
+			TNT1 A 0 LMG_BeltSprite("LM", "1", (invoker.ammo1.amount + invoker.ammo2.amount / 2) / 6, 1, 3);
 			"####" DEFGHI 1;
 			Stop;
 
@@ -989,7 +1224,7 @@ class PB_LMG : PB_WeaponBase
 
 		// Bullet 
 		BeltFireBullet:
-			TNT1 A 0 LMG_JumpState("BeltBullet87","BeltBullet6","BeltBullet5",null);
+			TNT1 A 0 LMG_JumpState("Be7689ltBullet87","BeltBullet6","BeltBullet5",null);
 			TNT1 A 4 ;
 			Stop;
 		BeltBullet87:
@@ -1111,7 +1346,7 @@ class PB_LMG : PB_WeaponBase
                 else
                     LMG_SetSprite("LQB7","LQB6","LQB5","LQB4","LQB3");
             }
-			LQB7 CDEFGHFEDC 1 LMG_SetSprite("LQM6","LQB7",simpleMode = true);
+			LQB7 CDEFGHFEDC 1 LMG_SetSprite("LQM6","LQB7",simpleMode:true);
 			LQB7 BA 1 {
                 if(inMicroMissileMode())
                     LMG_SetSprite("LQM6","LQM5","LQM4","LQM3");
