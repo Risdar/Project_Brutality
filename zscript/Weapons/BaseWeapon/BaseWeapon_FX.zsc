@@ -1,6 +1,9 @@
+// This file contains all the visual and sound effects that are used by PB's weapons
+// they're mostly gun smoke and some sound functions, 
+// though there are some misc. stuff like sprite manipulation
+
 extend class PB_WeaponBase
 {
-
 //////////////////////////// OVERLAYS ////////////////////////////////////////////////////////////////////////////////////
 	action void A_LegOverlay(int layer, statelabel st)
 	{

@@ -85,7 +85,7 @@ Actor TripleBarrelMode: Inventory
 {
 inventory.maxamount 1
 }
-
+/*
 // --------------------------------------------------------------------------
 
 // MiniGun and Deathdealer
@@ -1646,4 +1646,4 @@ ACTOR PB_Minigun : PB_Weapon //Replaces Chaingun
 			Loop
 				
 	}
-}
+}*/
